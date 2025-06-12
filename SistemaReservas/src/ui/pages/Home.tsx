@@ -1,12 +1,4 @@
-import { useState } from "react";
-import { ReservationProvider } from "./context/ReservationContext";
-import EncontrarPage from "./ui/pages/reservations/Encontrar";
-import InformacionPage from "./ui/pages/reservations/Informacion";
-import AdicionalPage from "./ui/pages/reservations/Adicional";
-import ConfirmacionPage from "./ui/pages/reservations/Confirmacion";
-import CompletadoPage from "./ui/pages/reservations/Completado";
-
-function HomeScreen({ onBook }: { onBook: () => void }) {
+export default function Home({ onBook }: { onBook: () => void }) {
   return (
     <div className="min-h-screen flex flex-col justify-between bg-[#2C3E50]">
       <div className="flex flex-col items-center justify-center flex-1">
@@ -45,32 +37,5 @@ function HomeScreen({ onBook }: { onBook: () => void }) {
         </div>
       </footer>
     </div>
-  );
-}
-
-export default function App() {
-  const [step, setStep] = useState<"home" | "encontrar" | "informacion" | "adicional" | "confirmacion" | "completado">("home");
-
-  return (
-    <ReservationProvider>
-      {step === "home" && (
-        <HomeScreen onBook={() => setStep("encontrar")} />
-      )}
-      {step === "encontrar" && (
-        <EncontrarPage onNext={() => setStep("informacion")} />
-      )}
-      {step === "informacion" && (
-        <InformacionPage onNext={() => setStep("adicional")} onBack={() => setStep("encontrar")} />
-      )}
-      {step === "adicional" && (
-        <AdicionalPage onNext={() => setStep("confirmacion")} onBack={() => setStep("informacion")} />
-      )}
-      {step === "confirmacion" && (
-        <ConfirmacionPage onNext={() => setStep("completado")} onBack={() => setStep("adicional")} />
-      )}
-      {step === "completado" && (
-        <CompletadoPage onNewReservation={() => setStep("encontrar")} onComplete={() => setStep("home")} />
-      )}
-    </ReservationProvider>
   );
 }
