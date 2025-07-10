@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ReservationProvider } from "./context/ReservationContext";
 import { GlobalReservationsProvider } from "./context/GlobalReservationsContext";
 import EncontrarPage from "./ui/pages/reservations/Encontrar";
+import HorariosPage from "./ui/pages/reservations/Horarios";
 import InformacionPage from "./ui/pages/reservations/Informacion";
 import AdicionalPage from "./ui/pages/reservations/Adicional";
 import ConfirmacionPage from "./ui/pages/reservations/Confirmacion";
@@ -75,6 +76,7 @@ export default function App() {
   const [step, setStep] = useState<
     | "home"
     | "encontrar"
+    | "horarios"
     | "informacion"
     | "adicional"
     | "confirmacion"
@@ -90,7 +92,7 @@ export default function App() {
             onBook={() => setStep("encontrar")}
             onColaborador={() => setStep("colaborador")}
           />
-        )}{" "}
+        )}
         {step === "colaborador" && (
           <ColaboradorApp onExit={() => setStep("home")} />
         )}
@@ -99,14 +101,20 @@ export default function App() {
         )}
         {step === "informacion" && (
           <InformacionPage
-            onNext={() => setStep("adicional")}
+            onNext={() => setStep("horarios")}
             onBack={() => setStep("encontrar")}
+          />
+        )}
+        {step === "horarios" && (
+          <HorariosPage
+            onNext={() => setStep("adicional")}
+            onBack={() => setStep("informacion")}
           />
         )}
         {step === "adicional" && (
           <AdicionalPage
             onNext={() => setStep("confirmacion")}
-            onBack={() => setStep("informacion")}
+            onBack={() => setStep("horarios")}
           />
         )}
         {step === "confirmacion" && (

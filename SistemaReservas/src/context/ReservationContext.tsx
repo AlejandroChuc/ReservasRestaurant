@@ -2,6 +2,7 @@ import { createContext, useContext, useState, type ReactNode } from "react"
 
 interface ReservationData {
   restaurant?: string
+  restaurantId?: number
   people?: string
   selectedDate?: number
   selectedTime?: string

@@ -13,7 +13,7 @@ export default function AdicionalPage({ onNext, onBack }: AdicionalPageProps) {
   const [specialRequests, setSpecialRequests] = useState(reservationData.specialRequests || "")
 
   useEffect(() => {
-    setCurrentStep(3)
+    setCurrentStep(4)
   }, [setCurrentStep])
 
   const handleContinue = () => {
@@ -36,7 +36,7 @@ export default function AdicionalPage({ onNext, onBack }: AdicionalPageProps) {
 
   return (
     <ReservationLayout
-      currentStep={3}
+      currentStep={4}
       title="Información Adicional"
       subtitle="Agregue cualquier solicitud especial para su reserva"
     >
@@ -58,7 +58,7 @@ export default function AdicionalPage({ onNext, onBack }: AdicionalPageProps) {
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-400">Personas:</span>
+                  <span className="text-slate-400">Personaadsdasds:</span>
                   <p className="text-white font-medium">{reservationData.people}</p>
                 </div>
               </div>
@@ -120,13 +120,7 @@ export default function AdicionalPage({ onNext, onBack }: AdicionalPageProps) {
           </div>
 
           {/* Group Message */}
-          <div className="mb-8">
-            <div className="p-4 border-2 border-amber-500/50 text-amber-400 rounded-xl text-center">
-              <p className="font-medium">Para grupos mayores de 8 personas</p>
-              <p className="text-sm text-amber-300 mt-1">Se requiere confirmación especial del restaurante</p>
-            </div>
-          </div>
-
+      
           {/* Navigation Buttons */}
           <div className="flex justify-between items-center">
             <button
@@ -136,7 +130,7 @@ export default function AdicionalPage({ onNext, onBack }: AdicionalPageProps) {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Volver
+              Volver a Información
             </button>
 
             <button

@@ -12,7 +12,7 @@ export default function ConfirmacionPage({ onNext, onBack }: ConfirmacionPagePro
   const [isConfirmed, setIsConfirmed] = useState(false)
 
   useEffect(() => {
-    setCurrentStep(4)
+    setCurrentStep(5)
   }, [setCurrentStep])
 
   // Función para formatear la fecha
@@ -66,7 +66,7 @@ export default function ConfirmacionPage({ onNext, onBack }: ConfirmacionPagePro
 
   return (
     <ReservationLayout
-      currentStep={4}
+      currentStep={5}
       title="Confirmación de Reserva"
       subtitle="Revise los detalles de su reserva antes de confirmar"
     >
