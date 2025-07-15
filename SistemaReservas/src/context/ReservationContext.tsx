@@ -6,10 +6,12 @@ interface ReservationData {
   people?: string
   selectedDate?: number
   selectedTime?: string
+  mealBlock?: string // <-- AGREGADO PARA BLOQUE DE COMIDA
   roomNumber?: string
   email?: string
   customerName?: string
   specialRequests?: string
+  allergies?: string // <-- NUEVO CAMPO
 }
 
 interface ReservationContextType {
@@ -17,6 +19,7 @@ interface ReservationContextType {
   updateReservationData: (data: Partial<ReservationData>) => void
   currentStep: number
   setCurrentStep: (step: number) => void
+  resetReservationData: () => void
 }
 
 const ReservationContext = createContext<ReservationContextType | undefined>(undefined)
@@ -29,8 +32,10 @@ export function ReservationProvider({ children }: { children: ReactNode }) {
     setReservationData((prev) => ({ ...prev, ...data }))
   }
 
+  const resetReservationData = () => setReservationData({})
+
   return (
-    <ReservationContext.Provider value={{ reservationData, updateReservationData, currentStep, setCurrentStep }}>
+    <ReservationContext.Provider value={{ reservationData, updateReservationData, currentStep, setCurrentStep, resetReservationData }}>
       {children}
     </ReservationContext.Provider>
   )

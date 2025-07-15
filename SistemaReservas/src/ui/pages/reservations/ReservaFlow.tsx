@@ -15,8 +15,7 @@ export default function ReservaFlow() {
       {step === 2 && <SelectDateTimeStep onNext={goNext} />}
       {step === 3 && <InformacionPage onNext={goNext} onBack={() => setStep(2)} />}
       {/*
-      {step === 4 && <AdicionalPage onNext={goNext} onBack={goBack} />}
-      {step === 5 && <ConfirmacionPage onBack={goBack} />}
+      
       */}
     </div>
   );

@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { ReservationProvider } from "./context/ReservationContext";
-import { GlobalReservationsProvider } from "./context/GlobalReservationsContext";
+// ...existing code...
 import EncontrarPage from "./ui/pages/reservations/Encontrar";
 import HorariosPage from "./ui/pages/reservations/Horarios";
 import InformacionPage from "./ui/pages/reservations/Informacion";
@@ -85,51 +84,46 @@ export default function App() {
   >("home");
 
   return (
-    <GlobalReservationsProvider>
-      <ReservationProvider>
-        {step === "home" && (
-          <HomeScreen
-            onBook={() => setStep("encontrar")}
-            onColaborador={() => setStep("colaborador")}
-          />
-        )}
-        {step === "colaborador" && (
-          <ColaboradorApp onExit={() => setStep("home")} />
-        )}
-        {step === "encontrar" && (
-          <EncontrarPage onNext={() => setStep("informacion")} />
-        )}
-        {step === "informacion" && (
-          <InformacionPage
-            onNext={() => setStep("horarios")}
-            onBack={() => setStep("encontrar")}
-          />
-        )}
-        {step === "horarios" && (
-          <HorariosPage
-            onNext={() => setStep("adicional")}
-            onBack={() => setStep("informacion")}
-          />
-        )}
-        {step === "adicional" && (
-          <AdicionalPage
-            onNext={() => setStep("confirmacion")}
-            onBack={() => setStep("horarios")}
-          />
-        )}
-        {step === "confirmacion" && (
-          <ConfirmacionPage
-            onNext={() => setStep("completado")}
-            onBack={() => setStep("adicional")}
-          />
-        )}
-        {step === "completado" && (
-          <CompletadoPage
-            onNewReservation={() => setStep("encontrar")}
-            onComplete={() => setStep("home")}
-          />
-        )}
-      </ReservationProvider>
-    </GlobalReservationsProvider>
+    <>
+      {step === "home" && (
+        <HomeScreen
+          onBook={() => setStep("encontrar")}
+          onColaborador={() => setStep("colaborador")}
+        />
+      )}
+      {step === "colaborador" && (
+        <ColaboradorApp onExit={() => setStep("home")} />
+      )}
+      {step === "encontrar" && (
+        <EncontrarPage onNext={() => setStep("informacion")} />
+      )}
+      {step === "informacion" && (
+        <InformacionPage
+          onNext={() => setStep("horarios")}
+          onBack={() => setStep("encontrar")}
+        />
+      )}
+      {step === "horarios" && (
+        <HorariosPage
+          onNext={() => setStep("adicional")}
+          onBack={() => setStep("informacion")}
+        />
+      )}
+      {step === "adicional" && (
+        <AdicionalPage
+          onNext={() => setStep("confirmacion")}
+          onBack={() => setStep("horarios")}
+        />
+      )}
+      {step === "confirmacion" && (
+        <ConfirmacionPage
+          onNext={() => setStep("completado")}
+          onBack={() => setStep("adicional")}
+        />
+      )}
+      {step === "completado" && (
+        <CompletadoPage onComplete={() => setStep("home")} />
+      )}
+    </>
   );
 }

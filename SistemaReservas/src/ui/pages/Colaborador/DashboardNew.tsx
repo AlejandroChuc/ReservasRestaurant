@@ -17,6 +17,7 @@ interface DashboardProps {
 export default function Dashboard({ user, onLogout }: DashboardProps) {
   const { allReservations, updateReservation } = useGlobalReservations();
   console.log("Dashboard rendered, reservas actuales:", allReservations.length);
+  console.log("Contenido actual de allReservations:", allReservations);
 
   const [filters, setFilters] = useState({
     restaurant: "",
@@ -107,6 +108,10 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#3A4A5C" }}>
+      {/* DEBUG: Mostrar reservas en crudo */}
+      <pre style={{ color: 'white', background: '#222', padding: 8, marginBottom: 16 }}>
+        {JSON.stringify(allReservations, null, 2)}
+      </pre>
       <DashboardHeader user={user} onLogout={onLogout} />
 
       <main className="p-6 space-y-6">

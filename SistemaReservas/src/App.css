@@ -1,5 +1,4 @@
-@import "tailwindcss/preflight";
-@tailwind utilities;
+/* Tailwind eliminado para evitar warning si no se usa directamente aquí */
 
 #root {
   max-width: 1280px;

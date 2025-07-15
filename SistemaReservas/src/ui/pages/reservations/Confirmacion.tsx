@@ -8,7 +8,7 @@ interface ConfirmacionPageProps {
 }
 
 export default function ConfirmacionPage({ onNext, onBack }: ConfirmacionPageProps) {
-  const { reservationData, setCurrentStep } = useReservation()
+  const { reservationData, setCurrentStep, resetReservationData } = useReservation()
   const [isConfirmed, setIsConfirmed] = useState(false)
 
   useEffect(() => {
@@ -42,6 +42,7 @@ export default function ConfirmacionPage({ onNext, onBack }: ConfirmacionPagePro
 
   const handleConfirmReservation = () => {
     setIsConfirmed(true)
+    resetReservationData(); // <--- Limpiar datos al confirmar
     // Simular proceso de confirmación
     setTimeout(() => {
       onNext()
@@ -135,29 +136,8 @@ export default function ConfirmacionPage({ onNext, onBack }: ConfirmacionPagePro
               <span className="text-lg text-gray-700 font-medium">{reservationData.restaurant}</span>
             </div>
 
-            {/* Location */}
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mt-1">
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <div className="text-lg text-gray-700">BOULEVARD KUKULKAN KM 13.5</div>
-                <div className="text-sm text-gray-500">Cancún, ROO, 77500</div>
-              </div>
-            </div>
+           
+       
 
             {/* Room Number */}
             <div className="flex items-center gap-4">
@@ -205,6 +185,21 @@ export default function ConfirmacionPage({ onNext, onBack }: ConfirmacionPagePro
                 <div>
                   <div className="text-sm text-gray-500 mb-1">Solicitudes Especiales:</div>
                   <div className="text-lg text-gray-700">{reservationData.specialRequests}</div>
+                </div>
+              </div>
+            )}
+            {/* Allergies */}
+            {reservationData.allergies && (
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mt-1">
+                  <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-sm text-red-400 mb-1">Alergias:</div>
+                  <div className="text-lg text-gray-700">{reservationData.allergies}</div>
                 </div>
               </div>
             )}

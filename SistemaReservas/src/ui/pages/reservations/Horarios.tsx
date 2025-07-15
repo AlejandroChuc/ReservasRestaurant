@@ -85,7 +85,7 @@ export default function SelectDateTimeStep({ onNext, onBack }: SelectDateTimeSte
       people,
       selectedDate,
       selectedTime,
-      selectedBlock,
+      mealBlock: selectedBlock,
     })
     onNext()
   }
@@ -249,7 +249,7 @@ export default function SelectDateTimeStep({ onNext, onBack }: SelectDateTimeSte
                 people,
                 selectedDate,
                 selectedTime,
-                selectedBlock,
+                mealBlock: selectedBlock,
               })
               if (typeof window !== "undefined") {
                 window.scrollTo({ top: 0, behavior: "smooth" })

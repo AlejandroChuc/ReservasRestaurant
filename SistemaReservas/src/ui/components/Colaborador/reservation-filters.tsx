@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { useGlobalReservations } from "../../../context/GlobalReservationsContext";
+import type { Reservation } from "../../../types";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -30,6 +32,9 @@ export function ReservationFilters({ onFilterChange }: FiltersProps) {
     arrivalStatus: "",
     serviceStatus: "",
   })
+
+  const { allReservations } = useGlobalReservations();
+  const uniqueRestaurants = Array.from(new Set((allReservations as Reservation[]).map(r => r.restaurant)));
 
   const handleFilterChange = (key: string, value: string) => {
     const newFilters = { ...filters, [key]: value }
@@ -86,18 +91,15 @@ export function ReservationFilters({ onFilterChange }: FiltersProps) {
                 <SelectValue placeholder="Seleccionar restaurante" />
               </SelectTrigger>
               <SelectContent className="bg-gray-700 border-gray-600">
-                <SelectItem value="eden-roc" className="text-white hover:bg-gray-600">
-                  Eden Roc
-                </SelectItem>
-                <SelectItem value="nobu" className="text-white hover:bg-gray-600">
-                  Nobu Hotel
-                </SelectItem>
-                <SelectItem value="unico" className="text-white hover:bg-gray-600">
-                  Unico
-                </SelectItem>
-                <SelectItem value="hard-rock" className="text-white hover:bg-gray-600">
-                  Hard Rock
-                </SelectItem>
+                {uniqueRestaurants.length === 0 ? (
+                  <SelectItem value="" className="text-white">No hay restaurantes</SelectItem>
+                ) : (
+                  uniqueRestaurants.map((rest) => (
+                    <SelectItem key={String(rest)} value={String(rest)} className="text-white hover:bg-gray-600">
+                      {String(rest)}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>

@@ -11,18 +11,17 @@ export default function AdicionalPage({ onNext, onBack }: AdicionalPageProps) {
   const { reservationData, updateReservationData, setCurrentStep } = useReservation()
 
   const [specialRequests, setSpecialRequests] = useState(reservationData.specialRequests || "")
+  const [allergies, setAllergies] = useState(reservationData.allergies || "")
 
   useEffect(() => {
     setCurrentStep(4)
   }, [setCurrentStep])
 
   const handleContinue = () => {
-    // Guardar datos del paso 3
     updateReservationData({
       specialRequests,
+      allergies,
     })
-
-    // Navegar a la confirmación
     onNext()
   }
 
@@ -88,6 +87,18 @@ export default function AdicionalPage({ onNext, onBack }: AdicionalPageProps) {
               rows={4}
               className="w-full bg-white/5 border border-white/20 rounded-xl px-6 py-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all backdrop-blur-sm resize-none text-lg"
               placeholder="Ej: Restricciones dietéticas, celebración especial, preferencias de mesa, alergias alimentarias..."
+            />
+          </div>
+
+          {/* Allergies Field */}
+          <div className="mb-8">
+            <label className="block text-lg font-medium text-white mb-4">Alergias (Opcional)</label>
+            <input
+              type="text"
+              value={allergies}
+              onChange={(e) => setAllergies(e.target.value)}
+              className="w-full bg-white/5 border border-white/20 rounded-xl px-6 py-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition-all backdrop-blur-sm text-lg"
+              placeholder="Ej: Mariscos, frutos secos, gluten, lactosa..."
             />
           </div>
 

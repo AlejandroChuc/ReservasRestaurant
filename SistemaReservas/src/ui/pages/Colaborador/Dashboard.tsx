@@ -14,112 +14,11 @@ interface DashboardProps {
   onLogout: () => void;
 }
 
-type MealBlock = "desayuno" | "comida" | "cena";
-type Status = "confirmada" | "cancelada" | "expirada";
 
-interface ReservationData {
-  id: string;
-  guestName: string;
-  roomNumber: string;
-  numberOfPeople: number;
-  restaurant: string;
-  date: string;
-  time: string;
-  mealBlock: MealBlock;
-  status: Status;
-  arrivalConfirmed: boolean;
-  mealCompleted: boolean;
-  arrivalTime?: string;
-  departureTime?: string;
-}
-
-// Datos de ejemplo - en una aplicación real vendrían de una API
-const mockReservations: ReservationData[] = [
-  {
-    id: "1",
-    guestName: "María González",
-    roomNumber: "205",
-    numberOfPeople: 4,
-    restaurant: "Eden Roc",
-    date: "2024-01-15",
-    time: "19:30",
-    mealBlock: "cena",
-    status: "confirmada",
-    arrivalConfirmed: false,
-    mealCompleted: false,
-  },
-  {
-    id: "2",
-    guestName: "Carlos Rodríguez",
-    roomNumber: "312",
-    numberOfPeople: 2,
-    restaurant: "Nobu Hotel",
-    date: "2024-01-15",
-    time: "13:00",
-    mealBlock: "comida",
-    status: "confirmada",
-    arrivalConfirmed: true,
-    mealCompleted: false,
-    arrivalTime: "13:05",
-  },
-  {
-    id: "3",
-    guestName: "Ana Martínez",
-    roomNumber: "108",
-    numberOfPeople: 6,
-    restaurant: "Unico",
-    date: "2024-01-16",
-    time: "08:45",
-    mealBlock: "desayuno",
-    status: "confirmada",
-    arrivalConfirmed: true,
-    mealCompleted: true,
-    arrivalTime: "08:50",
-    departureTime: "09:45",
-  },
-  {
-    id: "4",
-    guestName: "Roberto Silva",
-    roomNumber: "401",
-    numberOfPeople: 3,
-    restaurant: "Hard Rock",
-    date: "2024-01-14",
-    time: "21:15",
-    mealBlock: "cena",
-    status: "cancelada",
-    arrivalConfirmed: false,
-    mealCompleted: false,
-  },
-  {
-    id: "5",
-    guestName: "Laura Pérez",
-    roomNumber: "156",
-    numberOfPeople: 2,
-    restaurant: "Eden Roc",
-    date: "2024-01-13",
-    time: "07:00",
-    mealBlock: "desayuno",
-    status: "expirada",
-    arrivalConfirmed: false,
-    mealCompleted: false,
-  },
-  {
-    id: "6",
-    guestName: "Diego Morales",
-    roomNumber: "278",
-    numberOfPeople: 5,
-    restaurant: "Nobu Hotel",
-    date: "2024-01-16",
-    time: "14:30",
-    mealBlock: "comida",
-    status: "confirmada",
-    arrivalConfirmed: false,
-    mealCompleted: false,
-  },
-];
+// ...existing code...
 
 export default function Dashboard({ user, onLogout }: DashboardProps) {
-  const [reservations, setReservations] = useState(mockReservations);
+  const { allReservations, updateReservation } = useGlobalReservations();
   const [filters, setFilters] = useState({
     restaurant: "",
     date: "",
@@ -129,42 +28,29 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
     arrivalStatus: "",
     serviceStatus: "",
   });
+
   const handleConfirmArrival = (reservationId: string) => {
-    setReservations((prev) =>
-      prev.map((reservation) =>
-        reservation.id === reservationId
-          ? {
-              ...reservation,
-              arrivalConfirmed: true,
-              arrivalTime: new Date().toLocaleTimeString("es-ES", {
-                hour: "2-digit",
-                minute: "2-digit",
-              }),
-            }
-          : reservation
-      )
-    );
+    updateReservation(reservationId, {
+      arrivalConfirmed: true,
+      arrivalTime: new Date().toLocaleTimeString("es-ES", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    });
   };
 
   const handleCompleteMeal = (reservationId: string) => {
-    setReservations((prev) =>
-      prev.map((reservation) =>
-        reservation.id === reservationId
-          ? {
-              ...reservation,
-              mealCompleted: true,
-              departureTime: new Date().toLocaleTimeString("es-ES", {
-                hour: "2-digit",
-                minute: "2-digit",
-              }),
-            }
-          : reservation
-      )
-    );
+    updateReservation(reservationId, {
+      mealCompleted: true,
+      departureTime: new Date().toLocaleTimeString("es-ES", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    });
   };
 
   const filteredReservations = useMemo(() => {
-    return reservations.filter((reservation) => {
+    return allReservations.filter((reservation) => {
       const matchesRestaurant =
         !filters.restaurant ||
         reservation.restaurant
@@ -199,7 +85,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
         matchesServiceStatus
       );
     });
-  }, [filters, reservations]);
+  }, [filters, allReservations]);
 
   const stats = useMemo(() => {
     const total = filteredReservations.length;
