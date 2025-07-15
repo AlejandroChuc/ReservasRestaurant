@@ -87,6 +87,12 @@ export default function SelectDateTimeStep({ onNext, onBack }: SelectDateTimeSte
       selectedTime,
       mealBlock: selectedBlock,
     })
+    console.log('[INFO] HorariosPage reservationData:', {
+      people,
+      selectedDate,
+      selectedTime,
+      mealBlock: selectedBlock,
+    });
     onNext()
   }
 

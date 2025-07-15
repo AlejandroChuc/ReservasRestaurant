@@ -11,7 +11,8 @@ interface InformacionPageProps {
 
 export default function InformacionPage({ onNext, onBack }: InformacionPageProps) {
   const { reservationData, updateReservationData, setCurrentStep } = useReservation()
-  const [customerName, setCustomerName] = useState(reservationData.customerName || "")
+  const [firstName, setFirstName] = useState(reservationData.firstName || "")
+  const [lastName, setLastName] = useState(reservationData.lastName || "")
   const [email, setEmail] = useState(reservationData.email || "")
   const [roomNumber, setRoomNumber] = useState(reservationData.roomNumber || "")
   const [emailError, setEmailError] = useState("")
@@ -22,28 +23,38 @@ export default function InformacionPage({ onNext, onBack }: InformacionPageProps
   }, [setCurrentStep])
 
   const handleContinue = () => {
-    if (!customerName || !email || !roomNumber || emailError || roomError) {
+    if (!firstName || !lastName || !email || !roomNumber || emailError || roomError) {
       alert("Por favor complete todos los campos requeridos correctamente")
       return
     }
     updateReservationData({
-      customerName,
+      firstName,
+      lastName,
       email,
       roomNumber,
+      customerName: `${firstName} ${lastName}` // para compatibilidad
     })
+    console.log('[INFO] InformacionPage reservationData:', {
+      firstName,
+      lastName,
+      email,
+      roomNumber,
+    });
     onNext()
   }
 
   const handleBack = () => {
     updateReservationData({
-      customerName,
+      firstName,
+      lastName,
       email,
       roomNumber,
+      customerName: `${firstName} ${lastName}`
     })
     onBack()
   }
 
-  const isComplete = customerName && email && roomNumber && !emailError && !roomError
+  const isComplete = firstName && lastName && email && roomNumber && !emailError && !roomError
 
   // Validación de email
   const validateEmail = (value: string) => {
@@ -137,12 +148,12 @@ export default function InformacionPage({ onNext, onBack }: InformacionPageProps
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div>
               <label className="block text-lg font-medium text-white mb-4">
-                Nombre *{customerName && <span className="ml-2 text-green-400">✓</span>}
+                Nombre *{firstName && <span className="ml-2 text-green-400">✓</span>}
               </label>
               <input
                 type="text"
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
                 placeholder="Ingrese su nombre"
                 className="w-full bg-white/5 border border-white/20 rounded-xl px-6 py-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all backdrop-blur-sm text-lg"
                 required
@@ -150,12 +161,12 @@ export default function InformacionPage({ onNext, onBack }: InformacionPageProps
             </div>
             <div>
               <label className="block text-lg font-medium text-white mb-4">
-                Apellido *{customerName && <span className="ml-2 text-green-400">✓</span>}
+                Apellido *{lastName && <span className="ml-2 text-green-400">✓</span>}
               </label>
               <input
                 type="text"
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
                 placeholder="Ingrese su apellido"
                 className="w-full bg-white/5 border border-white/20 rounded-xl px-6 py-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all backdrop-blur-sm text-lg"
                 required

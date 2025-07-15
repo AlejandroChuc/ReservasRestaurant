@@ -9,7 +9,9 @@ interface ReservationData {
   mealBlock?: string // <-- AGREGADO PARA BLOQUE DE COMIDA
   roomNumber?: string
   email?: string
-  customerName?: string
+  customerName?: string // DEPRECATED, solo para compatibilidad
+  firstName?: string
+  lastName?: string
   specialRequests?: string
   allergies?: string // <-- NUEVO CAMPO
 }

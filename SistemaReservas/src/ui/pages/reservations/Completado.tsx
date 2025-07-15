@@ -1,6 +1,6 @@
 import { useReservation } from "../../../context/ReservationContext";
 import { useGlobalReservations } from "../../../context/GlobalReservationsContext";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { sendReservationConfirmationEmail, isValidEmail } from "../../../services/emailService";
 
 interface CompletadoPageProps {
@@ -11,14 +11,11 @@ export default function CompletadoPage({ onComplete }: CompletadoPageProps) {
   const { reservationData } = useReservation();
   const { addReservation } = useGlobalReservations();
   const [reservationNumber, setReservationNumber] = useState("");
-  // ...existing code...
+  const hasAddedReservation = useRef(false);
 
   useEffect(() => {
-    if (
-      reservationData.restaurant &&
-      reservationData.customerName &&
-      !reservationNumber
-    ) {
+    if (reservationData.restaurant && reservationData.customerName && !hasAddedReservation.current) {
+      hasAddedReservation.current = true;
       const newReservationNumber = `RES-${Math.random()
         .toString(36)
         .substr(2, 9)
@@ -33,7 +30,7 @@ export default function CompletadoPage({ onComplete }: CompletadoPageProps) {
       };
 
       const newReservation = {
-        guestName: reservationData.customerName, // guestName es el campo que usa el dashboard
+        guestName: `${reservationData.firstName || ""} ${reservationData.lastName || ""}`.trim() || reservationData.customerName || "",
         roomNumber: reservationData.roomNumber || "N/A",
         numberOfPeople: parseInt(reservationData.people || "1"),
         restaurant: reservationData.restaurant,
@@ -45,14 +42,14 @@ export default function CompletadoPage({ onComplete }: CompletadoPageProps) {
         mealCompleted: false,
         specialRequests: reservationData.specialRequests || "",
         allergies: reservationData.allergies || "",
+        email: reservationData.email || "",
       };
-
+      console.log("[Completado] Agregando reserva:", newReservation);
       addReservation(newReservation);
 
       if (reservationData.email && isValidEmail(reservationData.email)) {
-        // ...eliminado: setEmailSending
         const emailData = {
-          customerName: reservationData.customerName || "Cliente",
+          customerName: `${reservationData.firstName || ""} ${reservationData.lastName || ""}`.trim() || reservationData.customerName || "Cliente",
           customerEmail: reservationData.email,
           restaurant: reservationData.restaurant || "Restaurante",
           date: new Date().toLocaleDateString("es-ES"),
@@ -64,21 +61,18 @@ export default function CompletadoPage({ onComplete }: CompletadoPageProps) {
         };
         sendReservationConfirmationEmail(emailData)
           .then((success) => {
-            // ...eliminado: setEmailSending
             if (success) {
-              // ...eliminado: setEmailSent/setEmailError
-            } else {
-              // ...eliminado: setEmailError
+              // ...
             }
           })
           .catch(() => {
-            // ...eliminado: setEmailSending/setEmailError
+            // ...
           });
-      } else {
-        // ...eliminado: setEmailError
       }
+    } else if (!reservationData.restaurant || !reservationData.customerName) {
+      console.warn("[Completado] Datos insuficientes para agregar reserva:", reservationData);
     }
-  }, [reservationData, addReservation, reservationNumber]);
+  }, [reservationData, addReservation]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-4">

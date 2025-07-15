@@ -106,10 +106,10 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
     return { total, confirmed, totalGuests, currentlyDining, completedMeals };
   }, [filteredReservations]);
 
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#3A4A5C" }}>
       <DashboardHeader user={user} onLogout={onLogout} />
-
       <main className="p-6 space-y-6">
         {/* Estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">

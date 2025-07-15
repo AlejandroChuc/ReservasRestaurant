@@ -12,6 +12,9 @@ export interface Reservation {
   mealCompleted: boolean
   arrivalTime?: string
   departureTime?: string
+  specialRequests?: string
+  allergies?: string
+  email?: string
 }
 
 export interface User {

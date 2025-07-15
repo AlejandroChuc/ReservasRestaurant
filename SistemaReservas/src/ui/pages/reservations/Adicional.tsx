@@ -22,6 +22,10 @@ export default function AdicionalPage({ onNext, onBack }: AdicionalPageProps) {
       specialRequests,
       allergies,
     })
+    console.log('[INFO] AdicionalPage reservationData:', {
+      specialRequests,
+      allergies,
+    });
     onNext()
   }
 

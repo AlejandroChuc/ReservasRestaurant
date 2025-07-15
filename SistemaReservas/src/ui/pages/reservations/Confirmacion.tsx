@@ -42,8 +42,8 @@ export default function ConfirmacionPage({ onNext, onBack }: ConfirmacionPagePro
 
   const handleConfirmReservation = () => {
     setIsConfirmed(true)
-    resetReservationData(); // <--- Limpiar datos al confirmar
-    // Simular proceso de confirmación
+    console.log('[INFO] ConfirmacionPage reservationData:', reservationData);
+    // NO limpiar datos aquí, solo después de Completado
     setTimeout(() => {
       onNext()
     }, 2000)
