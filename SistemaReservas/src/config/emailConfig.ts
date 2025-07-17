@@ -2,16 +2,13 @@
 // IMPORTANTE: Reemplaza estos valores con tus credenciales de EmailJS
 
 export const EMAIL_CONFIG = {
-  // Servicio de EmailJS (ej: service_xxxxxxx)
-  SERVICE_ID: 'service_vnxzbve',
-  
-  // Template ID de EmailJS (ej: template_xxxxxxx)
-  TEMPLATE_ID: 'template_x1y1d9p',
-  
-  // Public Key de EmailJS (ej: user_xxxxxxxxxxxxxxxx)
-  PUBLIC_KEY: '92WWAi23dAonXJ8zF',
-  
-  // Configuración del hotel
+  // Servicio de EmailJS actualizado
+  SERVICE_ID: 'service_yhcqjig',
+  // Template ID actualizado
+  TEMPLATE_ID: 'template_idbzkcq',
+  // Public Key actualizado
+  PUBLIC_KEY: 'vBBNY1ilwNrcLV4cD',
+  // Configuración del hotel (puedes personalizar si quieres)
   HOTEL_INFO: {
     name: 'RCD Hotels',
     phone: '800-681-9205',

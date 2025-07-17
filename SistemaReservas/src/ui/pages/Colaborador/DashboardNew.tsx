@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarDays, Users, CheckCircle, LogOut } from "lucide-react";
 import type { User } from "../../../types";
 import { useGlobalReservations } from "../../../context/GlobalReservationsContext";
+import { testEmailJSDirectly } from '../../../config/emailConfig';
 
 interface DashboardProps {
   user: User | null;
@@ -107,6 +108,15 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
     <div className="min-h-screen" style={{ backgroundColor: "#3A4A5C" }}>
       <DashboardHeader user={user} onLogout={onLogout} />
       <main className="p-6 space-y-6">
+        {/* Botón temporal para probar el envío de correo */}
+        <div className="mb-4">
+          <button
+            onClick={() => testEmailJSDirectly()}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow font-semibold"
+          >
+            Probar envío de correo (EmailJS)
+          </button>
+        </div>
         {/* Estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           <Card className="border-0" style={{ backgroundColor: "#4A5A6C" }}>
@@ -201,54 +211,54 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
               </div>
             ) : (
               <div className="overflow-x-auto rounded-xl border border-gray-300 bg-white/80 shadow-lg">
-                <table className="min-w-full text-sm text-gray-800">
+                <table className="min-w-full text-xs md:text-sm text-gray-800">
   <thead className="bg-[#f5f6fa] sticky top-0 z-10">
     <tr>
-      <th className="px-4 py-3 font-semibold text-left border-b border-gray-200 w-48">Huésped</th>
-      <th className="px-4 py-3 font-semibold text-left border-b border-gray-200 w-32">Restaurante</th>
-      <th className="px-4 py-3 font-semibold text-left border-b border-gray-200 w-32">Bloque</th>
-      <th className="px-4 py-3 font-semibold text-left border-b border-gray-200 w-32">Estado</th>
-      <th className="px-4 py-3 font-semibold text-left border-b border-gray-200 w-32">Fecha</th>
-      <th className="px-4 py-3 font-semibold text-left border-b border-gray-200 w-40">Servicio y Acciones</th>
+      <th className="px-2 py-2 font-semibold text-left border-b border-gray-200 w-36 md:w-48">Huésped</th>
+      <th className="px-2 py-2 font-semibold text-left border-b border-gray-200 w-20 md:w-32">Restaurante</th>
+      <th className="px-2 py-2 font-semibold text-left border-b border-gray-200 w-20 md:w-32">Bloque</th>
+      <th className="px-2 py-2 font-semibold text-left border-b border-gray-200 w-20 md:w-32">Estado</th>
+      <th className="px-2 py-2 font-semibold text-left border-b border-gray-200 w-20 md:w-32">Fecha</th>
+      <th className="px-2 py-2 font-semibold text-left border-b border-gray-200 w-28 md:w-40">Servicio y Acciones</th>
     </tr>
   </thead>
   <tbody className="divide-y divide-gray-200">
     {filteredReservations.map((reservation) => (
       <tr key={reservation.id} className="hover:bg-[#f0f4fa] transition-all">
-        <td className="px-4 py-2 font-medium flex items-center gap-2">
+        <td className="px-2 py-1 md:px-4 md:py-2 font-medium flex items-center gap-1 md:gap-2">
           {reservation.guestName}
           <button
             title="Ver detalles"
-            className="ml-2 flex items-center gap-1 px-2 py-1 rounded-full border border-slate-300 bg-white hover:bg-slate-100 transition text-slate-700 text-xs font-semibold"
+            className="ml-1 md:ml-2 flex items-center gap-1 px-1.5 py-0.5 md:px-2 md:py-1 rounded-full border border-slate-300 bg-white hover:bg-slate-100 transition text-slate-700 text-[10px] md:text-xs font-semibold"
             onClick={() => {
               setSelectedReservation(reservation);
               setIsModalOpen(true);
             }}
           >
-            <Search className="w-4 h-4 text-slate-600" />
+            <Search className="w-3 h-3 md:w-4 md:h-4 text-slate-600" />
             <span>Detalles</span>
           </button>
         </td>
-        <td className="px-4 py-2">
-          <span className="inline-block px-2 py-1 rounded bg-orange-100 text-orange-700 font-semibold text-xs">{reservation.restaurant}</span>
+        <td className="px-2 py-1 md:px-4 md:py-2">
+          <span className="inline-block px-1.5 py-0.5 md:px-2 md:py-1 rounded bg-orange-100 text-orange-700 font-semibold text-[10px] md:text-xs">{reservation.restaurant}</span>
         </td>
-        <td className="px-4 py-2 capitalize">
-          <span className={`inline-block px-2 py-1 rounded font-semibold text-xs ${reservation.mealBlock === 'desayuno' ? 'bg-yellow-100 text-yellow-800' : reservation.mealBlock === 'comida' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>{reservation.mealBlock}</span>
+        <td className="px-2 py-1 md:px-4 md:py-2 capitalize">
+          <span className={`inline-block px-1.5 py-0.5 md:px-2 md:py-1 rounded font-semibold text-[10px] md:text-xs ${reservation.mealBlock === 'desayuno' ? 'bg-yellow-100 text-yellow-800' : reservation.mealBlock === 'comida' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>{reservation.mealBlock}</span>
         </td>
-        <td className="px-4 py-2">
-          <span className={`inline-block px-2 py-1 rounded font-bold text-xs ${reservation.status === 'confirmada' ? 'bg-green-200 text-green-800' : reservation.status === 'cancelada' ? 'bg-red-200 text-red-800' : 'bg-gray-200 text-gray-800'}`}>{reservation.status.charAt(0).toUpperCase() + reservation.status.slice(1)}</span>
+        <td className="px-2 py-1 md:px-4 md:py-2">
+          <span className={`inline-block px-1.5 py-0.5 md:px-2 md:py-1 rounded font-bold text-[10px] md:text-xs ${reservation.status === 'confirmada' ? 'bg-green-200 text-green-800' : reservation.status === 'cancelada' ? 'bg-red-200 text-red-800' : 'bg-gray-200 text-gray-800'}`}>{reservation.status.charAt(0).toUpperCase() + reservation.status.slice(1)}</span>
           {reservation.mealCompleted && (
-            <span className="ml-2 inline-block px-2 py-1 rounded text-xs font-bold bg-blue-100 text-blue-800">Comida Finalizada</span>
+            <span className="ml-1 md:ml-2 inline-block px-1.5 py-0.5 md:px-2 md:py-1 rounded text-[10px] md:text-xs font-bold bg-blue-100 text-blue-800">Comida Finalizada</span>
           )}
           {reservation.arrivalConfirmed && !reservation.mealCompleted && (
-            <span className="ml-2 inline-block px-2 py-1 rounded text-xs font-bold bg-orange-200 text-orange-800">En Restaurante</span>
+            <span className="ml-1 md:ml-2 inline-block px-1.5 py-0.5 md:px-2 md:py-1 rounded text-[10px] md:text-xs font-bold bg-orange-200 text-orange-800">En Restaurante</span>
           )}
         </td>
-        <td className="px-4 py-2">{reservation.date}</td>
-        <td className="px-4 py-2 space-x-2">
+        <td className="px-2 py-1 md:px-4 md:py-2">{reservation.date}</td>
+        <td className="px-2 py-1 md:px-4 md:py-2 space-x-1 md:space-x-2">
           {reservation.status === 'confirmada' && !reservation.arrivalConfirmed && (
             <button
-              className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-xs font-semibold transition-all shadow"
+              className="bg-orange-500 hover:bg-orange-600 text-white px-2 md:px-3 py-0.5 md:py-1 rounded text-[10px] md:text-xs font-semibold transition-all shadow"
               onClick={() => handleConfirmArrival(reservation.id)}
             >
               Confirmar Llegada
@@ -256,7 +266,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
           )}
           {reservation.arrivalConfirmed && !reservation.mealCompleted && (
             <button
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-semibold transition-all shadow"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-2 md:px-3 py-0.5 md:py-1 rounded text-[10px] md:text-xs font-semibold transition-all shadow"
               onClick={() => handleCompleteMeal(reservation.id)}
             >
               Finalizar Comida
@@ -273,13 +283,13 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
         </Card>
         {/* MODAL DE DETALLES DE RESERVA */}
         <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} className="fixed z-50 inset-0 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen px-4">
+          <div className="flex items-center justify-center min-h-screen px-2 md:px-4">
             {/* Overlay manual */}
             <div className="fixed inset-0 bg-black bg-opacity-40" aria-hidden="true" />
-            <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full mx-auto z-10 p-8">
-              <Dialog.Title className="text-xl font-bold mb-4 text-gray-800">Detalles de la Reserva</Dialog.Title>
+            <div className="relative bg-white rounded-xl shadow-xl max-w-xs md:max-w-md w-full mx-auto z-10 p-4 md:p-8">
+              <Dialog.Title className="text-lg md:text-xl font-bold mb-2 md:mb-4 text-gray-800">Detalles de la Reserva</Dialog.Title>
               {selectedReservation ? (
-                <div className="space-y-2 text-gray-700">
+                <div className="space-y-1 md:space-y-2 text-gray-700 text-xs md:text-base">
                   <div><span className="font-semibold">Huésped:</span> {selectedReservation.guestName}</div>
                   <div><span className="font-semibold">Restaurante:</span> {selectedReservation.restaurant}</div>
                   <div><span className="font-semibold">Fecha:</span> {selectedReservation.date}</div>
@@ -302,10 +312,10 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
                   )}
                 </div>
               ) : (
-                <div className="text-gray-500">No hay datos de la reserva.</div>
+                <div className="text-gray-500 text-xs md:text-base">No hay datos de la reserva.</div>
               )}
               <button
-                className="mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-semibold transition"
+                className="mt-4 md:mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-1.5 md:py-2 rounded-lg font-semibold transition text-xs md:text-base"
                 onClick={() => setIsModalOpen(false)}
               >
                 Cerrar
