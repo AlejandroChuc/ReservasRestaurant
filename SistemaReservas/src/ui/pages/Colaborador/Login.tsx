@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { User, Lock, Eye, EyeOff } from "lucide-react";
 
 interface LoginProps {
   onLogin: (user: { username: string; name: string }) => void;
@@ -42,6 +42,15 @@ export default function Login({ onLogin, onBack }: LoginProps) {
       className="min-h-screen flex flex-col justify-center items-center p-4"
       style={{ backgroundColor: "#3A4A5C" }}
     >
+      {/* Botón de regreso si se proporciona onBack */}
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="absolute left-4 top-4 bg-white/10 text-white px-4 py-2 rounded hover:bg-white/20 transition"
+        >
+          ← Volver
+        </button>
+      )}
       {/* Logo */}
       <div className="mb-8">
         <div className="border-4 border-white p-6 rounded-md">

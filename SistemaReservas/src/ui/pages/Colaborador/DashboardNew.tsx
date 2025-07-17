@@ -271,6 +271,48 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
             )}
           </CardContent>
         </Card>
+        {/* MODAL DE DETALLES DE RESERVA */}
+        <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} className="fixed z-50 inset-0 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4">
+            {/* Overlay manual */}
+            <div className="fixed inset-0 bg-black bg-opacity-40" aria-hidden="true" />
+            <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full mx-auto z-10 p-8">
+              <Dialog.Title className="text-xl font-bold mb-4 text-gray-800">Detalles de la Reserva</Dialog.Title>
+              {selectedReservation ? (
+                <div className="space-y-2 text-gray-700">
+                  <div><span className="font-semibold">Huésped:</span> {selectedReservation.guestName}</div>
+                  <div><span className="font-semibold">Restaurante:</span> {selectedReservation.restaurant}</div>
+                  <div><span className="font-semibold">Fecha:</span> {selectedReservation.date}</div>
+                  <div><span className="font-semibold">Hora:</span> {selectedReservation.time}</div>
+                  <div><span className="font-semibold">Bloque:</span> {selectedReservation.mealBlock}</div>
+                  <div><span className="font-semibold">Personas:</span> {selectedReservation.numberOfPeople}</div>
+                  <div><span className="font-semibold">Habitación:</span> {selectedReservation.roomNumber}</div>
+                  <div><span className="font-semibold">Estado:</span> {selectedReservation.status}</div>
+                  {selectedReservation.specialRequests && (
+                    <div><span className="font-semibold">Solicitudes especiales:</span> {selectedReservation.specialRequests}</div>
+                  )}
+                  {selectedReservation.allergies && (
+                    <div><span className="font-semibold">Alergias:</span> {selectedReservation.allergies}</div>
+                  )}
+                  {selectedReservation.arrivalConfirmed && (
+                    <div><span className="font-semibold">Llegada confirmada:</span> Sí</div>
+                  )}
+                  {selectedReservation.mealCompleted && (
+                    <div><span className="font-semibold">Comida finalizada:</span> Sí</div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-gray-500">No hay datos de la reserva.</div>
+              )}
+              <button
+                className="mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-semibold transition"
+                onClick={() => setIsModalOpen(false)}
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </Dialog>
       </main>
     </div>
   );

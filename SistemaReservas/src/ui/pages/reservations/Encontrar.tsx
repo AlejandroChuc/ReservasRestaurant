@@ -54,8 +54,9 @@ const restaurants = [
 
 export default function SelectRestaurantStep({ onNext }: SelectRestaurantStepProps) {
   const { reservationData, updateReservationData, setCurrentStep } = useReservation()
-  const [selected, setSelected] = useState(
-    restaurants.find((r) => r.name === reservationData.restaurant) || restaurants[0],
+  // No hay restaurante seleccionado por defecto
+  const [selected, setSelected] = useState<null | typeof restaurants[0]>(
+    restaurants.find((r) => r.name === reservationData.restaurant) || null
   )
   const [showDescription, setShowDescription] = useState<number | null>(null)
 
@@ -73,6 +74,7 @@ export default function SelectRestaurantStep({ onNext }: SelectRestaurantStepPro
   }
 
   const handleContinue = () => {
+    if (!selected) return;
     updateReservationData({
       restaurant: selected.name,
       restaurantId: selected.id,
@@ -94,7 +96,7 @@ export default function SelectRestaurantStep({ onNext }: SelectRestaurantStepPro
             <button
               onClick={() => handleCardClick(restaurant)}
               className={`w-full rounded-2xl p-0 transition-all duration-300 transform hover:scale-105 overflow-hidden h-56 flex flex-col justify-end relative ${
-                selected.id === restaurant.id ? "ring-4 ring-amber-500 shadow-xl" : "bg-white/10 border border-white/20"
+                selected && selected.id === restaurant.id ? "ring-4 ring-amber-500 shadow-xl" : "bg-white/10 border border-white/20"
               }`}
             >
               {restaurant.logo && (
@@ -129,7 +131,8 @@ export default function SelectRestaurantStep({ onNext }: SelectRestaurantStepPro
       <div className="text-center">
         <button
           onClick={handleContinue}
-          className="text-xl font-semibold px-12 py-4 rounded-full transition-all duration-300 bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:scale-105"
+          disabled={!selected}
+          className={`text-xl font-semibold px-12 py-4 rounded-full transition-all duration-300 bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:scale-105 ${!selected ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           Continuar a Información
         </button>

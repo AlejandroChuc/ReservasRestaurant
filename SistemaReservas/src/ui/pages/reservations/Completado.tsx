@@ -8,7 +8,7 @@ interface CompletadoPageProps {
 }
 
 export default function CompletadoPage({ onComplete }: CompletadoPageProps) {
-  const { reservationData } = useReservation();
+  const { reservationData, resetReservationData } = useReservation();
   const { addReservation } = useGlobalReservations();
   const [reservationNumber, setReservationNumber] = useState("");
   const hasAddedReservation = useRef(false);
@@ -74,6 +74,11 @@ export default function CompletadoPage({ onComplete }: CompletadoPageProps) {
     }
   }, [reservationData, addReservation]);
 
+  const handleGoHome = () => {
+    resetReservationData();
+    onComplete();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-4">
       <div className="bg-white rounded-3xl p-12 shadow-2xl max-w-md w-full text-center">
@@ -108,7 +113,7 @@ export default function CompletadoPage({ onComplete }: CompletadoPageProps) {
         </pre>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
-            onClick={onComplete}
+            onClick={handleGoHome}
             className="bg-slate-700 hover:bg-slate-800 text-white font-semibold px-8 py-3 rounded-full transition-all duration-300"
           >
             Volver al Inicio

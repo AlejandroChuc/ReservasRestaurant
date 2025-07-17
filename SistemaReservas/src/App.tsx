@@ -70,6 +70,7 @@ function HomeScreen({
     </div>
   );
 }
+const COLAB_KEY = "rcd-reservas-colab";
 
 export default function App() {
   const [step, setStep] = useState<
@@ -81,48 +82,66 @@ export default function App() {
     | "confirmacion"
     | "completado"
     | "colaborador"
-  >("home");
+  >(() => {
+    if (typeof window !== 'undefined') {
+      const isColab = localStorage.getItem(COLAB_KEY);
+      return isColab === 'true' ? "colaborador" : "home";
+    }
+    return "home";
+  });
+
+  // Actualizar localStorage solo cuando se entra o sale del modo colaborador
+  const setStepWithColab = (newStep: typeof step) => {
+    setStep(newStep);
+    if (typeof window !== 'undefined') {
+      if (newStep === 'colaborador') {
+        localStorage.setItem(COLAB_KEY, 'true');
+      } else if (newStep === 'home') {
+        localStorage.removeItem(COLAB_KEY);
+      }
+    }
+  };
 
   return (
     <>
       {step === "home" && (
         <HomeScreen
-          onBook={() => setStep("encontrar")}
-          onColaborador={() => setStep("colaborador")}
+          onBook={() => setStepWithColab("encontrar")}
+          onColaborador={() => setStepWithColab("colaborador")}
         />
       )}
       {step === "colaborador" && (
-        <ColaboradorApp onExit={() => setStep("home")} />
+        <ColaboradorApp onExit={() => setStepWithColab("home")} />
       )}
       {step === "encontrar" && (
-        <EncontrarPage onNext={() => setStep("informacion")} />
+        <EncontrarPage onNext={() => setStepWithColab("informacion")} />
       )}
       {step === "informacion" && (
         <InformacionPage
-          onNext={() => setStep("horarios")}
-          onBack={() => setStep("encontrar")}
+          onNext={() => setStepWithColab("horarios")}
+          onBack={() => setStepWithColab("encontrar")}
         />
       )}
       {step === "horarios" && (
         <HorariosPage
-          onNext={() => setStep("adicional")}
-          onBack={() => setStep("informacion")}
+          onNext={() => setStepWithColab("adicional")}
+          onBack={() => setStepWithColab("informacion")}
         />
       )}
       {step === "adicional" && (
         <AdicionalPage
-          onNext={() => setStep("confirmacion")}
-          onBack={() => setStep("horarios")}
+          onNext={() => setStepWithColab("confirmacion")}
+          onBack={() => setStepWithColab("horarios")}
         />
       )}
       {step === "confirmacion" && (
         <ConfirmacionPage
-          onNext={() => setStep("completado")}
-          onBack={() => setStep("adicional")}
+          onNext={() => setStepWithColab("completado")}
+          onBack={() => setStepWithColab("adicional")}
         />
       )}
       {step === "completado" && (
-        <CompletadoPage onComplete={() => setStep("home")} />
+        <CompletadoPage onComplete={() => setStepWithColab("home")} />
       )}
     </>
   );

@@ -71,16 +71,18 @@ const scheduleByRestaurantAndBlock: Record<number, Record<string, string[]>> = {
 
 export default function SelectDateTimeStep({ onNext, onBack }: SelectDateTimeStepProps) {
   const { reservationData, updateReservationData, setCurrentStep } = useReservation()
-  const [people, setPeople] = useState(reservationData.people || "2")
-  const [selectedDate, setSelectedDate] = useState(reservationData.selectedDate || days[0].num)
+  // Todo inicia vacío, el usuario debe seleccionar
+  const [people, setPeople] = useState(reservationData.people || "")
+  const [selectedDate, setSelectedDate] = useState<number | null>(reservationData.selectedDate || null)
   const [selectedTime, setSelectedTime] = useState(reservationData.selectedTime || "")
-  const [selectedBlock, setSelectedBlock] = useState<string>("Cena")
+  const [selectedBlock, setSelectedBlock] = useState<string>("")
 
   useEffect(() => {
     setCurrentStep(2)
   }, [setCurrentStep])
 
   const handleContinue = () => {
+    if (!people || !selectedDate || !selectedTime || !selectedBlock) return;
     updateReservationData({
       people,
       selectedDate,
@@ -96,10 +98,10 @@ export default function SelectDateTimeStep({ onNext, onBack }: SelectDateTimeSte
     onNext()
   }
 
-  const isComplete = selectedTime
-  const restaurantId = reservationData.restaurantId || 1
-  const timeSlots = scheduleByRestaurantAndBlock[restaurantId]?.[selectedBlock] || []
-  const selectedMealBlock = mealBlocks.find((block) => block.key === selectedBlock)
+  const isComplete = people && selectedDate && selectedTime && selectedBlock;
+  const restaurantId = reservationData.restaurantId;
+  const timeSlots = restaurantId && selectedBlock ? (scheduleByRestaurantAndBlock[restaurantId]?.[selectedBlock] || []) : [];
+  const selectedMealBlock = mealBlocks.find((block) => block.key === selectedBlock);
 
   return (
     <ReservationLayout
@@ -125,8 +127,8 @@ export default function SelectDateTimeStep({ onNext, onBack }: SelectDateTimeSte
           </div>
           <select
             className="w-full p-4 rounded-xl bg-white/10 border border-white/20 text-white text-lg backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-amber-500 hover:bg-white/15 transition-all"
-            value={people}
-            onChange={(e) => setPeople(e.target.value)}
+          value={people}
+          onChange={(e) => setPeople(e.target.value)}
           >
             {[...Array(8)].map((_, i) => (
               <option key={i + 1} value={i + 1} className="bg-slate-800">

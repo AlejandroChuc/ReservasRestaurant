@@ -4,16 +4,16 @@ interface ReservationData {
   restaurant?: string
   restaurantId?: number
   people?: string
-  selectedDate?: number
+  selectedDate?: number | null
   selectedTime?: string
-  mealBlock?: string // <-- AGREGADO PARA BLOQUE DE COMIDA
+  mealBlock?: string
   roomNumber?: string
   email?: string
-  customerName?: string // DEPRECATED, solo para compatibilidad
+  customerName?: string
+  specialRequests?: string
+  allergies?: string
   firstName?: string
   lastName?: string
-  specialRequests?: string
-  allergies?: string // <-- NUEVO CAMPO
 }
 
 interface ReservationContextType {

@@ -8,7 +8,7 @@ interface ConfirmacionPageProps {
 }
 
 export default function ConfirmacionPage({ onNext, onBack }: ConfirmacionPageProps) {
-  const { reservationData, setCurrentStep, resetReservationData } = useReservation()
+  const { reservationData, setCurrentStep } = useReservation()
   const [isConfirmed, setIsConfirmed] = useState(false)
 
   useEffect(() => {
