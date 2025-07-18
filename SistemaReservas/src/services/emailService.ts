@@ -3,7 +3,7 @@ import { EMAIL_CONFIG, USE_SIMULATION } from '../config/emailConfig'
 
 export interface EmailData {
   customerName: string
-  customerEmail: string
+  email: string
   restaurant: string
   date: string
   time: string
@@ -27,7 +27,7 @@ export const sendReservationConfirmationEmail = async (emailData: EmailData): Pr
     // Template parameters para EmailJS
     const templateParams = {
       to_name: emailData.customerName,
-      to_email: emailData.customerEmail,
+      email: emailData.email,
       customer_name: emailData.customerName,
       restaurant: emailData.restaurant,
       reservation_date: emailData.date,
@@ -44,7 +44,7 @@ export const sendReservationConfirmationEmail = async (emailData: EmailData): Pr
     if (USE_SIMULATION) {
       // Simular envío de email para desarrollo/testing
       await new Promise(resolve => setTimeout(resolve, 1000))
-      console.log('Email simulado enviado exitosamente para:', emailData.customerEmail)
+      console.log('Email simulado enviado exitosamente para:', emailData.email)
       return true
     } else {
       // Envío real de email usando EmailJS

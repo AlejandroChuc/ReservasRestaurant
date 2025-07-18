@@ -3,7 +3,7 @@
 
 export const EMAIL_CONFIG = {
   // Servicio de EmailJS actualizado
-  SERVICE_ID: 'service_yhcqjig',
+  SERVICE_ID: 'service_3zud7hh',
   // Template ID actualizado
   TEMPLATE_ID: 'template_idbzkcq',
   // Public Key actualizado
@@ -35,7 +35,7 @@ export const testEmailJSDirectly = async () => {
     
     const testData = {
       to_name: 'Usuario de Prueba',
-      to_email: 'Alejandrochuc3001@gmail.com', // TU EMAIL REAL
+      email: 'fernandojmay13@gmail.com', // TU EMAIL REAL
       customer_name: 'Usuario de Prueba',
       restaurant: 'FRIDA',
       reservation_date: new Date().toLocaleDateString('es-ES'),

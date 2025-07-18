@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { useReservation } from "../../../context/ReservationContext"
 import ReservationLayout from "../../components/Layout/ReservationLayout"
+import { sendReservationConfirmationEmail } from "../../../services/emailService";
 
 interface ConfirmacionPageProps {
   onNext: () => void;
@@ -40,14 +41,27 @@ export default function ConfirmacionPage({ onNext, onBack }: ConfirmacionPagePro
     return `${dayName}, ${day} ${monthName}`
   }
 
-  const handleConfirmReservation = () => {
-    setIsConfirmed(true)
-    console.log('[INFO] ConfirmacionPage reservationData:', reservationData);
-    // NO limpiar datos aquí, solo después de Completado
+  const handleConfirmReservation = async () => {
+    // Construye los datos para el email (todos los campos string y sin reservationNumber)
+    const emailData = {
+      customerName: reservationData.customerName || "",
+      email: reservationData.email || "fernandojmay13@gmail.com",
+      restaurant: reservationData.restaurant || "",
+      date: reservationData.selectedDate ? reservationData.selectedDate + " Mayo" : "",
+      time: reservationData.selectedTime || "",
+      numberOfPeople: reservationData.people ? reservationData.people.toString() : "1",
+      roomNumber: reservationData.roomNumber || "",
+      specialRequests: reservationData.specialRequests || "",
+      reservationNumber: "RES-" + Date.now(),
+    };
+    console.log('[RESERVA] Intentando enviar email de confirmación:', emailData);
+    const result = await sendReservationConfirmationEmail(emailData);
+    console.log('[RESERVA] Resultado de envío:', result);
+    setIsConfirmed(true);
     setTimeout(() => {
-      onNext()
-    }, 2000)
-  }
+      onNext();
+    }, 2000);
+  };
 
   if (isConfirmed) {
     return (
