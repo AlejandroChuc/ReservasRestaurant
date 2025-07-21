@@ -45,7 +45,7 @@ export default function ConfirmacionPage({ onNext, onBack }: ConfirmacionPagePro
     // Construye los datos para el email (todos los campos string y sin reservationNumber)
     const emailData = {
       customerName: reservationData.customerName || "",
-      email: reservationData.email || "fernandojmay13@gmail.com",
+      email: reservationData.email || "",
       restaurant: reservationData.restaurant || "",
       date: reservationData.selectedDate ? reservationData.selectedDate + " Mayo" : "",
       time: reservationData.selectedTime || "",

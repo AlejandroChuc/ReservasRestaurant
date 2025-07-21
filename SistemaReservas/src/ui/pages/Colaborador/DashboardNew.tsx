@@ -11,7 +11,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarDays, Users, CheckCircle, LogOut } from "lucide-react";
 import type { User } from "../../../types";
 import { useGlobalReservations } from "../../../context/GlobalReservationsContext";
-import { testEmailJSDirectly } from '../../../config/emailConfig';
 
 interface DashboardProps {
   user: User | null;
@@ -108,16 +107,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
     <div className="min-h-screen" style={{ backgroundColor: "#3A4A5C" }}>
       <DashboardHeader user={user} onLogout={onLogout} />
       <main className="p-6 space-y-6">
-        {/* Botón temporal para probar el envío de correo */}
-        <div className="mb-4">
-          <button
-            onClick={() => testEmailJSDirectly()}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow font-semibold"
-          >
-            Probar envío de correo (EmailJS)
-          </button>
-        </div>
-        {/* Estadísticas */}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           <Card className="border-0" style={{ backgroundColor: "#4A5A6C" }}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

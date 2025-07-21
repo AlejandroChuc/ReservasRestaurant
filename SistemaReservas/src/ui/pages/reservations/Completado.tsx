@@ -13,66 +13,6 @@ export default function CompletadoPage({ onComplete }: CompletadoPageProps) {
   const [reservationNumber, setReservationNumber] = useState("");
   const hasAddedReservation = useRef(false);
 
-  useEffect(() => {
-    if (reservationData.restaurant && reservationData.customerName && !hasAddedReservation.current) {
-      hasAddedReservation.current = true;
-      const newReservationNumber = `RES-${Math.random()
-        .toString(36)
-        .substr(2, 9)
-        .toUpperCase()}`;
-      setReservationNumber(newReservationNumber);
-
-      const getMealBlock = (time: string): "desayuno" | "comida" | "cena" => {
-        const hour = parseInt((time || "12:00").split(":")[0]);
-        if (hour >= 6 && hour < 12) return "desayuno";
-        if (hour >= 12 && hour < 18) return "comida";
-        return "cena";
-      };
-
-      const newReservation = {
-        guestName: `${reservationData.firstName || ""} ${reservationData.lastName || ""}`.trim() || reservationData.customerName || "",
-        roomNumber: reservationData.roomNumber || "N/A",
-        numberOfPeople: parseInt(reservationData.people || "1"),
-        restaurant: reservationData.restaurant,
-        date: new Date().toISOString().split("T")[0],
-        time: reservationData.selectedTime || "12:00",
-        mealBlock: getMealBlock(reservationData.selectedTime || "12:00"),
-        status: "confirmada" as const,
-        arrivalConfirmed: false,
-        mealCompleted: false,
-        specialRequests: reservationData.specialRequests || "",
-        allergies: reservationData.allergies || "",
-        email: reservationData.email || "",
-      };
-      console.log("[Completado] Agregando reserva:", newReservation);
-      addReservation(newReservation);
-
-      if (reservationData.email && isValidEmail(reservationData.email)) {
-        const emailData = {
-          customerName: `${reservationData.firstName || ""} ${reservationData.lastName || ""}`.trim() || reservationData.customerName || "Cliente",
-          customerEmail: reservationData.email,
-          restaurant: reservationData.restaurant || "Restaurante",
-          date: new Date().toLocaleDateString("es-ES"),
-          time: reservationData.selectedTime || "12:00",
-          numberOfPeople: reservationData.people || "1",
-          roomNumber: reservationData.roomNumber || "N/A",
-          reservationNumber: newReservationNumber,
-          specialRequests: reservationData.specialRequests || "Ninguna",
-        };
-        sendReservationConfirmationEmail(emailData)
-          .then((success) => {
-            if (success) {
-              // ...
-            }
-          })
-          .catch(() => {
-            // ...
-          });
-      }
-    } else if (!reservationData.restaurant || !reservationData.customerName) {
-      console.warn("[Completado] Datos insuficientes para agregar reserva:", reservationData);
-    }
-  }, [reservationData, addReservation]);
 
   const handleGoHome = () => {
     resetReservationData();
@@ -100,17 +40,13 @@ export default function CompletadoPage({ onComplete }: CompletadoPageProps) {
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           ¡Reserva Confirmada!
         </h2>
+        <p className="text-green-700 font-semibold mb-2">
+          Se envió correo con éxito a <span className="font-mono">{reservationData.email}</span>
+        </p>
         <p className="text-gray-600 mb-6">
-          Su reserva en <strong>{reservationData.restaurant}</strong> ha sido
-          confirmada exitosamente.
+          Su reserva en <strong>{reservationData.restaurant}</strong> ha sido confirmada exitosamente.
         </p>
-        <p className="text-sm text-gray-500 mb-8">
-          Número de confirmación: {reservationNumber || "Generando..."}
-        </p>
-        {/* DEBUG VISUAL: Mostrar la última reserva enviada */}
-        <pre style={{ color: 'black', background: '#eee', padding: 8, marginBottom: 16 }}>
-          {JSON.stringify({ reservationData, reservationNumber }, null, 2)}
-        </pre>
+        
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
             onClick={handleGoHome}

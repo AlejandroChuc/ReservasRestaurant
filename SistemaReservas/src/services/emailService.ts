@@ -36,6 +36,8 @@ export const sendReservationConfirmationEmail = async (emailData: EmailData): Pr
       room_number: emailData.roomNumber,
       reservation_number: emailData.reservationNumber,
       special_requests: emailData.specialRequests || 'Ninguna',
+      allergies: (emailData as any).allergies || '',
+      from_name: 'Hard Rock Hotels',
       hotel_name: EMAIL_CONFIG.HOTEL_INFO.name,
       hotel_phone: EMAIL_CONFIG.HOTEL_INFO.phone,
       hotel_address: EMAIL_CONFIG.HOTEL_INFO.address
@@ -61,7 +63,7 @@ export const sendReservationConfirmationEmail = async (emailData: EmailData): Pr
         EMAIL_CONFIG.PUBLIC_KEY
       )
       
-      console.log('Email enviado exitosamente:', response.status, response.text)
+      console.log(`Se envió correo con éxito a ${emailData.email}:`, response.status, response.text)
       return true
     }
   } catch (error) {
