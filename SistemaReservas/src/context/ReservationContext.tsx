@@ -7,6 +7,7 @@ interface ReservationData {
   selectedDate?: number | null
   selectedTime?: string
   mealBlock?: string
+  id_horario?: number
   roomNumber?: string
   email?: string
   customerName?: string

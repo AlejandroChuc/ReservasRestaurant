@@ -23,85 +23,63 @@ const days = [
   { num: 2, day: "Wed", fullDay: "Miércoles" },
 ]
 
-// 🔹 Bloques de comida con iconos
-const mealBlocks = [
-  {
-    key: "Desayuno",
-    label: "Desayuno",
-    icon: "☀️",
-    time: "7:00 - 10:00",
-  },
-  {
-    key: "Comida",
-    label: "Comida",
-    icon: "🌞",
-    time: "12:30 - 15:30",
-  },
-  {
-    key: "Cena",
-    label: "Cena",
-    icon: "🌙",
-    time: "18:00 - 22:00",
-  },
-]
 
-// 🔹 Horarios por restaurante y bloque
-const scheduleByRestaurantAndBlock: Record<number, Record<string, string[]>> = {
-  1: {
-    Desayuno: ["07:00", "08:00", "09:00", "10:00"],
-    Comida: ["13:00", "14:00", "15:00"],
-    Cena: ["18:00", "19:30", "21:00", "22:00"],
-  },
-  2: {
-    Desayuno: ["07:30", "08:30", "09:30"],
-    Comida: ["13:30", "14:30", "15:30"],
-    Cena: ["17:30", "19:00", "20:30", "21:30"],
-  },
-  3: {
-    Desayuno: ["08:00", "09:00", "10:00"],
-    Comida: ["12:30", "13:30", "14:30"],
-    Cena: ["19:00", "20:00", "21:00"],
-  },
-  4: {
-    Desayuno: ["07:00", "08:00", "09:00"],
-    Comida: ["13:00", "14:00", "15:00"],
-    Cena: ["18:30", "20:00", "21:30"],
-  },
-}
+// Bloques de comida con iconos (solo para mostrar)
+const mealBlockIcons: Record<string, { icon: string; label: string }> = {
+  Desayuno: { icon: "☀️", label: "Desayuno" },
+  Comida: { icon: "🌞", label: "Comida" },
+  Cena: { icon: "🌙", label: "Cena" },
+};
 
 export default function SelectDateTimeStep({ onNext, onBack }: SelectDateTimeStepProps) {
   const { reservationData, updateReservationData, setCurrentStep } = useReservation()
   // Todo inicia vacío, el usuario debe seleccionar
-  const [people, setPeople] = useState(reservationData.people || "")
-  const [selectedDate, setSelectedDate] = useState<number | null>(reservationData.selectedDate || null)
-  const [selectedTime, setSelectedTime] = useState(reservationData.selectedTime || "")
-  const [selectedBlock, setSelectedBlock] = useState<string>("")
+
+  const [people, setPeople] = useState(reservationData.people || "");
+  // Obtener el día actual (número del día del mes)
+  const today = new Date();
+  const todayNum = today.getDate();
+  const [selectedDate, setSelectedDate] = useState<number | null>(reservationData.selectedDate || todayNum);
+  const [selectedBlock, setSelectedBlock] = useState<string>("");
+  const [horarios, setHorarios] = useState<any[]>([]);
+  const [selectedHorarioId, setSelectedHorarioId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const restaurantId = reservationData.restaurantId;
 
   useEffect(() => {
-    setCurrentStep(2)
-  }, [setCurrentStep])
+    setCurrentStep(2);
+    if (restaurantId) {
+      setLoading(true);
+      fetch(`/api/getHorarios?restauranteId=${restaurantId}`)
+        .then(res => res.json())
+        .then(data => {
+          setHorarios(data);
+          setLoading(false);
+        });
+    }
+  }, [restaurantId, setCurrentStep]);
+
+  // Obtener bloques únicos disponibles para el restaurante
+  const availableBlocks = Array.from(new Set(horarios.map(h => h.bloque_comida)));
+  // Horarios filtrados por bloque
+  const timeSlots = horarios.filter(h => h.bloque_comida === selectedBlock);
+  const selectedMealBlock = selectedBlock ? mealBlockIcons[selectedBlock] : null;
 
   const handleContinue = () => {
-    if (!people || !selectedDate || !selectedTime || !selectedBlock) return;
+    if (!people || !selectedDate || !selectedBlock || !selectedHorarioId) return;
+    const horario = horarios.find(h => h.id_horario === selectedHorarioId);
     updateReservationData({
       people,
       selectedDate,
-      selectedTime,
+      selectedTime: horario?.hora_inicio,
       mealBlock: selectedBlock,
-    })
-    console.log('[INFO] HorariosPage reservationData:', {
-      people,
-      selectedDate,
-      selectedTime,
-      mealBlock: selectedBlock,
+      id_horario: selectedHorarioId,
     });
-    onNext()
-  }
+    onNext();
+  };
 
-  const isComplete = people && selectedDate && selectedTime && selectedBlock;
-  const restaurantId = reservationData.restaurantId;
-  const timeSlots = restaurantId && selectedBlock ? (scheduleByRestaurantAndBlock[restaurantId]?.[selectedBlock] || []) : [];
-  const selectedMealBlock = mealBlocks.find((block) => block.key === selectedBlock);
+  const isComplete = people && selectedDate && selectedBlock && selectedHorarioId;
 
   return (
     <ReservationLayout
@@ -172,82 +150,87 @@ export default function SelectDateTimeStep({ onNext, onBack }: SelectDateTimeSte
         </div>
 
         {/* Bloque de comida - Mejorado */}
-        <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+        {restaurantId && horarios.length > 0 && (
+          <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <label className="text-white text-lg font-semibold">Bloque de comida</label>
             </div>
-            <label className="text-white text-lg font-semibold">Bloque de comida</label>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {mealBlocks.map((block) => (
-              <button
-                key={block.key}
-                className={`p-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 ${
-                  selectedBlock === block.key
-                    ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-xl shadow-amber-500/25"
-                    : "bg-white/10 text-white hover:bg-white/20 border border-white/20"
-                }`}
-                onClick={() => {
-                  setSelectedBlock(block.key)
-                  setSelectedTime("") // Limpiar selección de horario al cambiar bloque
-                }}
-              >
-                <div className="text-2xl mb-2">{block.icon}</div>
-                <div className="font-semibold text-lg">{block.label}</div>
-                <div className="text-xs opacity-80 mt-1">{block.time}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Horarios disponibles - Mejorado */}
-        <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <label className="text-white text-lg font-semibold">
-              Horarios disponibles para {selectedMealBlock?.label}
-            </label>
-          </div>
-
-          {timeSlots.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-              {timeSlots.map((time) => (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {availableBlocks.map((block) => (
                 <button
-                  key={time}
-                  className={`px-4 py-3 rounded-xl text-lg font-medium transition-all duration-300 transform hover:scale-105 ${
-                    selectedTime === time
+                  key={block}
+                  className={`p-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 ${
+                    selectedBlock === block
                       ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-xl shadow-amber-500/25"
                       : "bg-white/10 text-white hover:bg-white/20 border border-white/20"
                   }`}
-                  onClick={() => setSelectedTime(time)}
+                  onClick={() => {
+                    setSelectedBlock(block);
+                    setSelectedHorarioId(null); // Limpiar selección de horario al cambiar bloque
+                  }}
                 >
-                  {time}
+                  <div className="text-2xl mb-2">{mealBlockIcons[block]?.icon || "🍽️"}</div>
+                  <div className="font-semibold text-lg">{mealBlockIcons[block]?.label || block}</div>
                 </button>
               ))}
             </div>
-          ) : (
-            <div className="text-center py-8">
-              <div className="text-slate-400 text-lg">No hay horarios disponibles para este bloque</div>
+          </div>
+        )}
+
+        {/* Horarios disponibles - Mejorado */}
+        {restaurantId && horarios.length > 0 && selectedBlock && (
+          <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <label className="text-white text-lg font-semibold">
+                Horarios disponibles para {selectedMealBlock?.label}
+              </label>
             </div>
-          )}
-        </div>
+
+            {loading ? (
+              <div className="text-white text-center">Cargando horarios...</div>
+            ) : timeSlots.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                {timeSlots.map((h) => (
+                  <button
+                    key={h.id_horario}
+                    className={`px-4 py-3 rounded-xl text-lg font-medium transition-all duration-300 transform hover:scale-105 ${
+                      selectedHorarioId === h.id_horario
+                        ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-xl shadow-amber-500/25"
+                        : "bg-white/10 text-white hover:bg-white/20 border border-white/20"
+                    }`}
+                    onClick={() => setSelectedHorarioId(h.id_horario)}
+                  >
+                    {h.hora_inicio} - {h.hora_fin}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-slate-400 text-lg">No hay horarios disponibles para este bloque</div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Botones de navegación - Mejorados */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-6 pt-4">
@@ -256,7 +239,7 @@ export default function SelectDateTimeStep({ onNext, onBack }: SelectDateTimeSte
               updateReservationData({
                 people,
                 selectedDate,
-                selectedTime,
+                // selectedTime, // Eliminado porque no existe
                 mealBlock: selectedBlock,
               })
               if (typeof window !== "undefined") {

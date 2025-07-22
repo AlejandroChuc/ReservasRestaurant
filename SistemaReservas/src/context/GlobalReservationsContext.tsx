@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import type { Reservation } from "../types";
 
 interface GlobalReservationsContextType {
@@ -20,45 +20,28 @@ export function GlobalReservationsProvider({
 }: {
   children: ReactNode;
 }) {
-  // Cargar reservas desde localStorage si existen
-  const getInitialReservations = () => {
-    const stored = localStorage.getItem("rcd_reservas");
-    if (stored) {
+  const [allReservations, setAllReservations] = useState<Reservation[]>([]);
+
+  // Cargar reservas desde la base de datos al montar el provider
+  useEffect(() => {
+    async function fetchReservations() {
       try {
-        return JSON.parse(stored);
-      } catch {
-        return initialReservations;
+        const res = await fetch("/api/getReservations");
+        const data = await res.json();
+        setAllReservations(data);
+      } catch (error) {
+        console.error("Error al cargar reservas desde la base de datos:", error);
       }
     }
-    return initialReservations;
+    fetchReservations();
+  }, []);
+
+  // Métodos vacíos o de solo lectura, ya que la edición se hará vía API
+  const addReservation = () => {
+    throw new Error("addReservation solo disponible vía backend/API");
   };
-
-  const [allReservations, setAllReservations] = useState<Reservation[]>(getInitialReservations());
-
-  const addReservation = (reservationData: Omit<Reservation, "id">) => {
-    console.log("addReservation llamada con datos:", reservationData);
-    const newReservation: Reservation = {
-      ...reservationData,
-      id: Date.now().toString(), // En producción usarías un UUID
-    };
-    console.log("Nueva reserva con ID:", newReservation);
-    setAllReservations((prev) => {
-      const updated = [...prev, newReservation];
-      // Guardar en localStorage
-      localStorage.setItem("rcd_reservas", JSON.stringify(updated));
-      console.log("Reservas actualizadas:", updated);
-      return updated;
-    });
-  };
-
-  const updateReservation = (id: string, updates: Partial<Reservation>) => {
-    setAllReservations((prev) => {
-      const updated = prev.map((reservation) =>
-        reservation.id === id ? { ...reservation, ...updates } : reservation
-      );
-      localStorage.setItem("rcd_reservas", JSON.stringify(updated));
-      return updated;
-    });
+  const updateReservation = () => {
+    throw new Error("updateReservation solo disponible vía backend/API");
   };
 
   const getReservationById = (id: string) => {

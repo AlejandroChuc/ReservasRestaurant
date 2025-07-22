@@ -9,7 +9,41 @@ interface CompletadoPageProps {
 
 export default function CompletadoPage({ onComplete }: CompletadoPageProps) {
   const { reservationData, resetReservationData } = useReservation();
-  const { addReservation } = useGlobalReservations();
+  // const { addReservation } = useGlobalReservations();
+  useEffect(() => {
+    // Solo guardar una vez por render
+    if (hasAddedReservation.current) return;
+    hasAddedReservation.current = true;
+
+    // Aquí debes mapear reservationData a los campos que espera la API
+    // Debes tener los IDs de huésped y horario ya generados
+    // Si no los tienes, deberías crearlos antes de la reserva
+    // Aquí se asume que reservationData.restaurantId y reservationData.horarioId existen
+    const payload = {
+      id_huesped: reservationData.id_huesped || 1, // Ajusta según tu flujo real
+      id_horario: reservationData.id_horario, // Usa el id_horario real seleccionado
+      fecha_reserva: reservationData.selectedDate || new Date().toISOString().slice(0, 10),
+      num_personas: reservationData.people || 2,
+      alergias: reservationData.allergies || '',
+      estado: 'Pendiente',
+      confirmacion: false
+    };
+
+    fetch('/api/createReservation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) {
+          console.error('Error al guardar reserva:', data.error || data);
+        }
+      })
+      .catch(err => {
+        console.error('Error al guardar reserva:', err);
+      });
+  }, [reservationData]);
   const [reservationNumber, setReservationNumber] = useState("");
   const hasAddedReservation = useRef(false);
 
