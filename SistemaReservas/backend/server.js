@@ -84,13 +84,85 @@ app.delete('/api/huespedes/:id', async (req, res) => {
   }
 });
 
+// Validar datos de huésped para reserva
+app.post('/api/huespedes/validar', async (req, res) => {
+  try {
+    const { 
+      nombre, 
+      apellido_paterno, 
+      apellido_materno, 
+      num_habitacion, 
+      numero_personas, 
+      correo 
+    } = req.body;
+
+    // Validar que todos los campos estén presentes (sin fechas)
+    if (!nombre || !apellido_paterno || !apellido_materno || !num_habitacion || 
+        !numero_personas || !correo) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Todos los campos son obligatorios' 
+      });
+    }
+
+    // Buscar huésped que coincida con los datos básicos (sin fechas)
+    const [rows] = await db.execute(
+      `SELECT id_huesped, nombre, apellido_paterno, apellido_materno, num_habitacion, 
+              numero_personas, fecha_llegada, fecha_salida, correo
+       FROM Huesped 
+       WHERE nombre = ? AND apellido_paterno = ? AND apellido_materno = ? 
+       AND num_habitacion = ? AND numero_personas = ? AND correo = ?`,
+      [nombre, apellido_paterno, apellido_materno, num_habitacion, 
+       numero_personas, correo]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'No se encontró ningún huésped con esos datos. Verifique que todos los datos sean correctos.' 
+      });
+    }
+
+    const huesped = rows[0];
+    const fechaActual = new Date();
+    const fechaLlegada = new Date(huesped.fecha_llegada);
+    const fechaSalida = new Date(huesped.fecha_salida);
+
+    // Validar que la fecha actual esté dentro de su estancia
+    if (fechaActual < fechaLlegada || fechaActual > fechaSalida) {
+      return res.status(400).json({ 
+        success: false, 
+        error: `Su estancia es del ${fechaLlegada.toLocaleDateString()} al ${fechaSalida.toLocaleDateString()}. Solo puede reservar durante su estancia en el hotel.` 
+      });
+    }
+
+    // Si todo es válido, devolver el id_huesped y datos básicos
+    res.json({ 
+      success: true, 
+      id_huesped: huesped.id_huesped,
+      nombre_completo: `${huesped.nombre} ${huesped.apellido_paterno} ${huesped.apellido_materno}`,
+      num_habitacion: huesped.num_habitacion,
+      fecha_llegada: huesped.fecha_llegada,
+      fecha_salida: huesped.fecha_salida,
+      correo: huesped.correo
+    });
+
+  } catch (error) {
+    console.error('Error al validar huésped:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error interno del servidor al validar los datos' 
+    });
+  }
+});
+
 // --- CRUD Restaurante ---
 app.post('/api/restaurantes', async (req, res) => {
   try {
-    const { nombre, capacidad_max, descripcion, logo } = req.body;
+    const { nombre, capacidad_max, descripcion, logo, tipoCocina } = req.body;
     const [result] = await db.execute(
-      `INSERT INTO Restaurante (nombre, capacidad_max, descripcion, logo) VALUES (?, ?, ?, ?)`,
-      [nombre, capacidad_max, descripcion, logo || null]
+      `INSERT INTO Restaurante (nombre, capacidad_max, descripcion, logo, tipoCocina) VALUES (?, ?, ?, ?, ?)`,
+      [nombre, capacidad_max, descripcion, logo || null, tipoCocina || null]
     );
     res.status(201).json({ success: true, id: result.insertId });
   } catch (error) {
@@ -101,7 +173,21 @@ app.post('/api/restaurantes', async (req, res) => {
 
 app.get('/api/restaurantes', async (req, res) => {
   try {
-    const [rows] = await db.execute('SELECT * FROM Restaurante');
+    const [rows] = await db.execute(`
+      SELECT 
+        id_restaurante,
+        nombre,
+        CASE 
+          WHEN LENGTH(descripcion) > 50 
+          THEN CONCAT(LEFT(descripcion, 47), '...')
+          ELSE descripcion
+        END as descripcion,
+        capacidad_max,
+        logo,
+        tipoCocina,
+        imagenUrl
+      FROM Restaurante
+    `);
     res.json(rows);
   } catch (error) {
     console.error('Error al obtener restaurantes:', error);
@@ -126,10 +212,10 @@ app.get('/api/restaurantes/:id', async (req, res) => {
 app.put('/api/restaurantes/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, capacidad_max, descripcion, logo } = req.body;
+    const { nombre, capacidad_max, descripcion, logo, tipoCocina } = req.body;
     const [result] = await db.execute(
-      `UPDATE Restaurante SET nombre=?, capacidad_max=?, descripcion=?, logo=? WHERE id_restaurante=?`,
-      [nombre, capacidad_max, descripcion, logo || null, id]
+      `UPDATE Restaurante SET nombre=?, capacidad_max=?, descripcion=?, logo=?, tipoCocina=? WHERE id_restaurante=?`,
+      [nombre, capacidad_max, descripcion, logo || null, tipoCocina || null, id]
     );
     if (result.affectedRows === 0) {
       return res.status(404).json({ success: false, error: 'Restaurante no encontrado' });

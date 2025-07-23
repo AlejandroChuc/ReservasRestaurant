@@ -3,5 +3,6 @@ export interface Restaurante {
   nombre: string;
   descripcion: string;
   tipoCocina: string;
-  imagenUrl?: string;
+  capacidad_max: number;
+  logo?: string;
 }
