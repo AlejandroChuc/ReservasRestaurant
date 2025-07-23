@@ -27,15 +27,15 @@ export default function ReservationLayout({
               <span className="text-2xl">🍽️</span>
             </div>
             <h1 className="text-5xl font-light text-white tracking-wider">
-              Selecciona tu restaurante fav
-              <span className="block text-2xl text-amber-400 font-normal mt-1">Reservations</span>
+              HARD ROCK HOTEL | Cancún
+              <span className="block text-2xl text-amber-400 font-normal mt-1">Reservaciones</span>
             </h1>
             <div className="w-12 h-12 bg-gradient-to-r from-amber-400 to-amber-600 rounded-full flex items-center justify-center shadow-lg">
               <span className="text-2xl">🍽️</span>
             </div>
           </div>
           <p className="text-slate-300 text-lg max-w-2xl mx-auto leading-relaxed">
-            Vistaos
+            
           </p>
         </div>
 

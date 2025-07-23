@@ -11,6 +11,7 @@ export interface EmailData {
   roomNumber: string
   reservationNumber: string
   specialRequests?: string
+  allergies?: string    
 }
 
 export const sendReservationConfirmationEmail = async (emailData: EmailData): Promise<boolean> => {
@@ -171,6 +172,11 @@ export const getEmailTemplate = (data: EmailData): string => {
               <strong>Solicitudes Especiales:</strong>
               <span>${data.specialRequests}</span>
             </div>` : ''}
+            ${data.allergies ? `
+      <div class="detail-row">
+        <strong>Alergias:</strong>
+        <span>${data.allergies}</span>
+      </div>` : ''}
           </div>
           
           <p><strong>Importante:</strong> Por favor presente este número de confirmación al llegar al restaurante.</p>
@@ -190,18 +196,4 @@ export const getEmailTemplate = (data: EmailData): string => {
   `
 }
 
-/*
-INSTRUCCIONES PARA CONFIGURAR EMAILJS:
 
-1. Ve a https://www.emailjs.com/ y crea una cuenta
-2. Crea un nuevo servicio (Gmail, Outlook, etc.)
-3. Crea una plantilla de email con las variables especificadas en CONFIGURACION_EMAIL.md
-4. Ve al archivo src/config/emailConfig.ts y actualiza:
-   - SERVICE_ID: Tu Service ID de EmailJS
-   - TEMPLATE_ID: Tu Template ID de EmailJS  
-   - PUBLIC_KEY: Tu Public Key de EmailJS
-5. Cambia USE_SIMULATION de true a false para envío real
-
-IMPORTANTE: Mientras USE_SIMULATION esté en true, los emails se simularán.
-Para enviar emails reales, configura tus credenciales y cambia USE_SIMULATION a false.
-*/

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { getHorarios } from "../../../application/api/horarios"
 import { useReservation } from "../../../context/ReservationContext"
 import ReservationLayout from "../../components/Layout/ReservationLayout"
 
@@ -45,29 +46,9 @@ const mealBlocks = [
   },
 ]
 
-// 🔹 Horarios por restaurante y bloque
-const scheduleByRestaurantAndBlock: Record<number, Record<string, string[]>> = {
-  1: {
-    Desayuno: ["07:00", "08:00", "09:00", "10:00"],
-    Comida: ["13:00", "14:00", "15:00"],
-    Cena: ["18:00", "19:30", "21:00", "22:00"],
-  },
-  2: {
-    Desayuno: ["07:30", "08:30", "09:30"],
-    Comida: ["13:30", "14:30", "15:30"],
-    Cena: ["17:30", "19:00", "20:30", "21:30"],
-  },
-  3: {
-    Desayuno: ["08:00", "09:00", "10:00"],
-    Comida: ["12:30", "13:30", "14:30"],
-    Cena: ["19:00", "20:00", "21:00"],
-  },
-  4: {
-    Desayuno: ["07:00", "08:00", "09:00"],
-    Comida: ["13:00", "14:00", "15:00"],
-    Cena: ["18:30", "20:00", "21:30"],
-  },
-}
+
+// Horarios obtenidos de la API
+
 
 export default function SelectDateTimeStep({ onNext, onBack }: SelectDateTimeStepProps) {
   const { reservationData, updateReservationData, setCurrentStep } = useReservation()
@@ -76,10 +57,26 @@ export default function SelectDateTimeStep({ onNext, onBack }: SelectDateTimeSte
   const [selectedDate, setSelectedDate] = useState<number | null>(reservationData.selectedDate || null)
   const [selectedTime, setSelectedTime] = useState(reservationData.selectedTime || "")
   const [selectedBlock, setSelectedBlock] = useState<string>("")
+  const [horarios, setHorarios] = useState([])
+  const [loadingHorarios, setLoadingHorarios] = useState(false)
+  const [errorHorarios, setErrorHorarios] = useState("")
+
 
   useEffect(() => {
     setCurrentStep(2)
   }, [setCurrentStep])
+
+  // Cargar horarios desde la API
+  useEffect(() => {
+    setLoadingHorarios(true)
+    getHorarios()
+      .then((data) => {
+        setHorarios(data)
+        setErrorHorarios("")
+      })
+      .catch(() => setErrorHorarios("Error al cargar horarios"))
+      .finally(() => setLoadingHorarios(false))
+  }, [])
 
   const handleContinue = () => {
     if (!people || !selectedDate || !selectedTime || !selectedBlock) return;
@@ -100,7 +97,13 @@ export default function SelectDateTimeStep({ onNext, onBack }: SelectDateTimeSte
 
   const isComplete = people && selectedDate && selectedTime && selectedBlock;
   const restaurantId = reservationData.restaurantId;
-  const timeSlots = restaurantId && selectedBlock ? (scheduleByRestaurantAndBlock[restaurantId]?.[selectedBlock] || []) : [];
+  // Filtrar horarios reales según restaurante y bloque
+  const timeSlots = horarios
+    .filter((h) =>
+      (!restaurantId || h.id_restaurante === restaurantId) &&
+      (!selectedBlock || h.bloque_comida === selectedBlock)
+    )
+    .map((h) => h.hora_inicio);
   const selectedMealBlock = mealBlocks.find((block) => block.key === selectedBlock);
 
   return (
@@ -226,7 +229,11 @@ export default function SelectDateTimeStep({ onNext, onBack }: SelectDateTimeSte
             </label>
           </div>
 
-          {timeSlots.length > 0 ? (
+          {loadingHorarios ? (
+            <div className="text-center py-8 text-slate-400 text-lg">Cargando horarios...</div>
+          ) : errorHorarios ? (
+            <div className="text-center py-8 text-red-400 text-lg">{errorHorarios}</div>
+          ) : timeSlots.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
               {timeSlots.map((time) => (
                 <button
