@@ -7,16 +7,13 @@ import AdicionalPage from "./ui/pages/reservations/Adicional";
 import ConfirmacionPage from "./ui/pages/reservations/Confirmacion";
 import CompletadoPage from "./ui/pages/reservations/Completado";
 import ColaboradorApp from "./ui/pages/Colaborador/index";
-import ReservaFlow from "./ui/pages/reservations/ReservaFlow";
 
 function HomeScreen({
   onBook,
   onColaborador,
-  onNuevaReserva,
 }: {
   onBook: () => void;
   onColaborador: () => void;
-  onNuevaReserva: () => void;
 }) {
   return (
     <div className="min-h-screen flex flex-col justify-between bg-[#2C3E50]">
@@ -39,12 +36,6 @@ function HomeScreen({
             className="bg-[#C4912E] hover:bg-[#b07e1d] text-black font-semibold text-xl px-12 py-4 rounded-lg border-2 border-black shadow transition"
           >
             Book Now (Original)
-          </button>
-          <button
-            onClick={onNuevaReserva}
-            className="bg-[#27AE60] hover:bg-[#229954] text-white font-semibold text-xl px-12 py-4 rounded-lg border-2 border-white shadow transition"
-          >
-            🏨 Nueva Reserva con Validación
           </button>
           <button
             onClick={onColaborador}
@@ -91,7 +82,6 @@ export default function App() {
     | "confirmacion"
     | "completado"
     | "colaborador"
-    | "nueva-reserva"
   >(() => {
     if (typeof window !== 'undefined') {
       const isColab = localStorage.getItem(COLAB_KEY);
@@ -118,11 +108,7 @@ export default function App() {
         <HomeScreen
           onBook={() => setStepWithColab("encontrar")}
           onColaborador={() => setStepWithColab("colaborador")}
-          onNuevaReserva={() => setStepWithColab("nueva-reserva")}
         />
-      )}
-      {step === "nueva-reserva" && (
-        <ReservaFlow onExit={() => setStepWithColab("home")} />
       )}
       {step === "colaborador" && (
         <ColaboradorApp onExit={() => setStepWithColab("home")} />
