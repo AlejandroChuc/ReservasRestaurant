@@ -4,8 +4,24 @@ import cors from 'cors';
 import { db } from './db/db.js';
 
 const app = express();
-app.use(cors());
+
+// Configuración más específica de CORS
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Accept', 'Authorization'],
+  credentials: true
+}));
+
 app.use(express.json());
+
+// Middleware para log de todas las peticiones
+app.use((req, res, next) => {
+  console.log(`📥 ${req.method} ${req.path} - ${new Date().toISOString()}`);
+  console.log(`🔗 Origin: ${req.headers.origin || 'No origin'}`);
+  console.log(`📋 Headers: ${JSON.stringify(req.headers)}`);
+  next();
+});
 
 // --- CRUD Huesped ---
 // Crear huesped
@@ -87,39 +103,124 @@ app.delete('/api/huespedes/:id', async (req, res) => {
 // Validar datos de huésped para reserva
 app.post('/api/huespedes/validar', async (req, res) => {
   try {
+    console.log('🔍 Validando huésped - datos recibidos:', req.body);
+    console.log('🔍 Headers recibidos:', req.headers);
+    console.log('🔍 Content-Type:', req.headers['content-type']);
+    console.log('🔍 Tipo de req.body:', typeof req.body);
+    console.log('🔍 req.body como JSON:', JSON.stringify(req.body, null, 2));
+    
     const { 
       nombre, 
       apellido_paterno, 
       apellido_materno, 
       num_habitacion, 
-      numero_personas, 
       correo 
     } = req.body;
 
-    // Validar que todos los campos estén presentes (sin fechas)
-    if (!nombre || !apellido_paterno || !apellido_materno || !num_habitacion || 
-        !numero_personas || !correo) {
+    // Validar que todos los campos estén presentes (sin numero_personas)
+    console.log('🔍 Validando campos recibidos:');
+    console.log('- nombre:', `"${nombre}" (${typeof nombre}) - ${nombre ? '✅' : '❌'}`);
+    console.log('- apellido_paterno:', `"${apellido_paterno}" (${typeof apellido_paterno}) - ${apellido_paterno ? '✅' : '❌'}`);
+    console.log('- apellido_materno:', `"${apellido_materno}" (${typeof apellido_materno}) - ${apellido_materno ? '✅' : '❌'}`);
+    console.log('- num_habitacion:', `"${num_habitacion}" (${typeof num_habitacion}) - ${num_habitacion ? '✅' : '❌'}`);
+    console.log('- correo:', `"${correo}" (${typeof correo}) - ${correo ? '✅' : '❌'}`);
+    
+    if (!nombre || !apellido_paterno || !apellido_materno || !num_habitacion || !correo) {
+      console.log('❌ Campos faltantes detectados:', { 
+        nombre: !!nombre, 
+        apellido_paterno: !!apellido_paterno, 
+        apellido_materno: !!apellido_materno, 
+        num_habitacion: !!num_habitacion, 
+        correo: !!correo 
+      });
       return res.status(400).json({ 
         success: false, 
-        error: 'Todos los campos son obligatorios' 
+        error: 'Todos los campos son obligatorios',
+        details: {
+          nombre: !!nombre,
+          apellido_paterno: !!apellido_paterno,
+          apellido_materno: !!apellido_materno,
+          num_habitacion: !!num_habitacion,
+          correo: !!correo
+        }
       });
     }
 
-    // Buscar huésped que coincida con los datos básicos (sin fechas)
+    console.log('✅ Todos los campos presentes, buscando en BD...');
+    console.log('🔍 Criterios de búsqueda (el correo NO se valida, se acepta cualquiera):', {
+      nombre: `"${nombre}" (${typeof nombre})`,
+      apellido_paterno: `"${apellido_paterno}" (${typeof apellido_paterno})`,
+      apellido_materno: `"${apellido_materno}" (${typeof apellido_materno})`,
+      num_habitacion: `"${num_habitacion}" (${typeof num_habitacion})`,
+      correo_usuario: `"${correo}" (correo que ingresó el usuario)`
+    });
+
+    // Primero, vamos a ver todos los huéspedes para debug
+    console.log('🔍 Viendo todos los huéspedes en la BD...');
+    const [allGuests] = await db.execute('SELECT * FROM Huesped');
+    console.log(`📊 Total de huéspedes en BD: ${allGuests.length}`);
+    
+    allGuests.forEach((guest, index) => {
+      console.log(`Huésped ${index + 1}:`, {
+        id: guest.id_huesped,
+        nombre: `"${guest.nombre}"`,
+        apellido_paterno: `"${guest.apellido_paterno}"`,
+        apellido_materno: `"${guest.apellido_materno}"`,
+        num_habitacion: guest.num_habitacion,
+        correo: `"${guest.correo}"`,
+        numero_personas: guest.numero_personas
+      });
+    });
+
+    // Buscar huésped que coincida con los datos básicos (sin correo en la búsqueda)
+    console.log('🔍 Buscando huésped con query exacta (sin validar correo)...');
     const [rows] = await db.execute(
       `SELECT id_huesped, nombre, apellido_paterno, apellido_materno, num_habitacion, 
               numero_personas, fecha_llegada, fecha_salida, correo
        FROM Huesped 
        WHERE nombre = ? AND apellido_paterno = ? AND apellido_materno = ? 
-       AND num_habitacion = ? AND numero_personas = ? AND correo = ?`,
-      [nombre, apellido_paterno, apellido_materno, num_habitacion, 
-       numero_personas, correo]
+       AND num_habitacion = ?`,
+      [nombre, apellido_paterno, apellido_materno, num_habitacion]
     );
+
+    console.log(`📊 Resultados encontrados: ${rows.length}`);
+    if (rows.length > 0) {
+      console.log('✅ Huésped encontrado:', rows[0]);
+    } else {
+      console.log('❌ No se encontró huésped con esos criterios');
+      
+      // Búsquedas parciales para debugging
+      console.log('🔍 Haciendo búsquedas parciales para diagnosticar...');
+      
+      const [byName] = await db.execute('SELECT * FROM Huesped WHERE nombre = ?', [nombre]);
+      console.log(`🔍 Por nombre "${nombre}": ${byName.length} resultados`);
+      
+      const [byRoom] = await db.execute('SELECT * FROM Huesped WHERE num_habitacion = ?', [num_habitacion]);
+      console.log(`🔍 Por habitación ${num_habitacion}: ${byRoom.length} resultados`);
+      
+      const [byEmail] = await db.execute('SELECT * FROM Huesped WHERE correo = ?', [correo]);
+      console.log(`🔍 Por email "${correo}": ${byEmail.length} resultados`);
+      
+      if (byName.length > 0) {
+        console.log('📋 Huéspedes encontrados por nombre:');
+        byName.forEach(guest => {
+          console.log(`  - "${guest.nombre}" "${guest.apellido_paterno}" "${guest.apellido_materno}" | Hab: ${guest.num_habitacion} | Email: "${guest.correo}"`);
+        });
+      }
+      
+      if (byRoom.length > 0) {
+        console.log('📋 Huéspedes encontrados por habitación:');
+        byRoom.forEach(guest => {
+          console.log(`  - "${guest.nombre}" "${guest.apellido_paterno}" "${guest.apellido_materno}" | Hab: ${guest.num_habitacion} | Email: "${guest.correo}"`);
+        });
+      }
+    }
 
     if (rows.length === 0) {
       return res.status(404).json({ 
         success: false, 
-        error: 'No se encontró ningún huésped con esos datos. Verifique que todos los datos sean correctos.' 
+        error: 'No se encontró ningún huésped con ese nombre, apellidos y número de habitación. Verifique estos datos. El correo puede ser cualquiera.',
+        debug: 'Revisa los logs del servidor para más detalles sobre las búsquedas parciales' 
       });
     }
 
@@ -137,6 +238,7 @@ app.post('/api/huespedes/validar', async (req, res) => {
     }
 
     // Si todo es válido, devolver el id_huesped y datos básicos
+    // Usamos el correo que envió el usuario (puede ser diferente al de la BD)
     res.json({ 
       success: true, 
       id_huesped: huesped.id_huesped,
@@ -144,7 +246,8 @@ app.post('/api/huespedes/validar', async (req, res) => {
       num_habitacion: huesped.num_habitacion,
       fecha_llegada: huesped.fecha_llegada,
       fecha_salida: huesped.fecha_salida,
-      correo: huesped.correo
+      correo: correo, // Usamos el correo que ingresó el usuario
+      numero_personas: huesped.numero_personas // Agregamos número de personas
     });
 
   } catch (error) {
@@ -159,10 +262,10 @@ app.post('/api/huespedes/validar', async (req, res) => {
 // --- CRUD Restaurante ---
 app.post('/api/restaurantes', async (req, res) => {
   try {
-    const { nombre, capacidad_max, descripcion, logo, tipoCocina } = req.body;
+    const { nombre, capacidad_max, descripcion, logo } = req.body;
     const [result] = await db.execute(
-      `INSERT INTO Restaurante (nombre, capacidad_max, descripcion, logo, tipoCocina) VALUES (?, ?, ?, ?, ?)`,
-      [nombre, capacidad_max, descripcion, logo || null, tipoCocina || null]
+      `INSERT INTO Restaurante (nombre, capacidad_max, descripcion, logo) VALUES (?, ?, ?, ?)`,
+      [nombre, capacidad_max, descripcion, logo || null]
     );
     res.status(201).json({ success: true, id: result.insertId });
   } catch (error) {
@@ -183,9 +286,7 @@ app.get('/api/restaurantes', async (req, res) => {
           ELSE descripcion
         END as descripcion,
         capacidad_max,
-        logo,
-        tipoCocina,
-        imagenUrl
+        logo
       FROM Restaurante
     `);
     res.json(rows);
@@ -212,10 +313,10 @@ app.get('/api/restaurantes/:id', async (req, res) => {
 app.put('/api/restaurantes/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, capacidad_max, descripcion, logo, tipoCocina } = req.body;
+    const { nombre, capacidad_max, descripcion, logo } = req.body;
     const [result] = await db.execute(
-      `UPDATE Restaurante SET nombre=?, capacidad_max=?, descripcion=?, logo=?, tipoCocina=? WHERE id_restaurante=?`,
-      [nombre, capacidad_max, descripcion, logo || null, tipoCocina || null, id]
+      `UPDATE Restaurante SET nombre=?, capacidad_max=?, descripcion=?, logo=? WHERE id_restaurante=?`,
+      [nombre, capacidad_max, descripcion, logo || null, id]
     );
     if (result.affectedRows === 0) {
       return res.status(404).json({ success: false, error: 'Restaurante no encontrado' });
@@ -508,6 +609,16 @@ app.delete('/api/reservas/:id', async (req, res) => {
 });
 
 const PORT = 4000;
+
+// Endpoint de prueba
+app.get('/api/test', (req, res) => {
+  console.log('✅ Endpoint /api/test llamado');
+  res.json({ 
+    message: 'Servidor funcionando correctamente', 
+    timestamp: new Date().toISOString() 
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor backend escuchando en http://localhost:${PORT}`);
 });

@@ -4,7 +4,11 @@ import SelectDateTimeStep from "./Horarios";
 import InformacionPage from "./Informacion";
 // Importa los demás pasos cuando existan
 
-export default function ReservaFlow() {
+interface ReservaFlowProps {
+  onExit: () => void;
+}
+
+export default function ReservaFlow({ onExit }: ReservaFlowProps) {
   const [step, setStep] = useState(1);
 
   const goNext = () => setStep((s) => s + 1);

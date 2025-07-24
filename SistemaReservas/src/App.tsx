@@ -7,7 +7,7 @@ import AdicionalPage from "./ui/pages/reservations/Adicional";
 import ConfirmacionPage from "./ui/pages/reservations/Confirmacion";
 import CompletadoPage from "./ui/pages/reservations/Completado";
 import ColaboradorApp from "./ui/pages/Colaborador/index";
-import ReservationFlowApp from "./pages/ReservationFlowApp";
+import ReservaFlow from "./ui/pages/reservations/ReservaFlow";
 
 function HomeScreen({
   onBook,
@@ -122,7 +122,7 @@ export default function App() {
         />
       )}
       {step === "nueva-reserva" && (
-        <ReservationFlowApp onExit={() => setStepWithColab("home")} />
+        <ReservaFlow onExit={() => setStepWithColab("home")} />
       )}
       {step === "colaborador" && (
         <ColaboradorApp onExit={() => setStepWithColab("home")} />
