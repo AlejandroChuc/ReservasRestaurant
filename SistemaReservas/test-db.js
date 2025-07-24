@@ -8,7 +8,7 @@ const testConnection = async () => {
     const connection = await mysql.createConnection({
       host: 'localhost',
       user: 'root',
-      password: 'Bizcocho-8',
+      password: '0000',
       database: 'reservas_restaurante'
     });
 

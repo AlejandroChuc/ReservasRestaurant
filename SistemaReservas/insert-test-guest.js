@@ -8,7 +8,7 @@ const data = {
   numero_personas: 2,
   fecha_llegada: '2025-07-23',
   fecha_salida: '2025-07-27',
-  correo: 'fernando.may@test.com'
+  correo: 'fernando.nuevo@gmail.com'
 };
 
 console.log('Insertando huésped de prueba:', data);

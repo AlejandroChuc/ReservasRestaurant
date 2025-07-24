@@ -368,7 +368,7 @@ app.get('/api/horarios', async (req, res) => {
 });
 
 // Obtener horarios disponibles para un restaurante en una fecha específica
-app.get('/api/horarios/disponibilidad', async (req, res) => {
+app.get('/api/horarios/disponibles', async (req, res) => {
   try {
     const { restaurante, fecha, personas, huesped } = req.query;
 
@@ -427,11 +427,10 @@ app.get('/api/horarios/disponibilidad', async (req, res) => {
     const fechaSalida = new Date(huesped_data[0].fecha_salida);
     const fechaReserva = new Date(fecha);
 
-    // La fecha de reserva debe ser >= fecha de llegada y < fecha de salida (no incluir día de checkout)
-    if (fechaReserva < fechaLlegada || fechaReserva >= fechaSalida) {
+    if (fechaReserva < fechaLlegada || fechaReserva > fechaSalida) {
       return res.status(400).json({
         success: false,
-        message: `La fecha debe estar entre tu estancia (${fechaLlegada.toLocaleDateString()} - ${new Date(fechaSalida.getTime() - 86400000).toLocaleDateString()}). No puedes hacer reservas para el día de salida.`
+        message: `La fecha debe estar entre tu estancia (${fechaLlegada.toLocaleDateString()} - ${fechaSalida.toLocaleDateString()})`
       });
     }
 

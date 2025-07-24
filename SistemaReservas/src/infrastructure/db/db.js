@@ -1,9 +1,10 @@
 const mysql = require('mysql2');
 
 const connection = mysql.createConnection({
-  host: '3306',
+  host: 'localhost',
+  port: 3306,
   user: 'root', // Cambia por tu usuario de MySQL
-  password: 'Bizcocho-8', // Cambia por tu contraseña de MySQL
+  password: '0000', // Cambia por tu contraseña de MySQL
   database: 'reservas_restaurante'
 });
     

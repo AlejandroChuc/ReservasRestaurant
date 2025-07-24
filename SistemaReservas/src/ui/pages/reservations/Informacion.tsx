@@ -24,39 +24,6 @@ export default function InformacionPage({ onNext, onBack }: InformacionPageProps
   const [validationError, setValidationError] = useState("")
   const [huespedData, setHuespedData] = useState<any>(null)
 
-  // Función para llenar con datos de prueba
-  const fillWithTestData = () => {
-    setFirstName("Fernando")
-    setApellidoPaterno("May")
-    setApellidoMaterno("Bustos")
-    setEmail("fernando.nuevo@gmail.com") // Email diferente al de la BD
-    setRoomNumber("456")
-    setEmailError("")
-    setRoomError("")
-  }
-
-  // Función para llenar con datos de prueba 2
-  const fillWithTestData2 = () => {
-    setFirstName("Fernando")
-    setApellidoPaterno("May")
-    setApellidoMaterno("Bustos")
-    setEmail("fernando.may@test.com") // Email original de la BD
-    setRoomNumber("456")
-    setEmailError("")
-    setRoomError("")
-  }
-
-  // Función para llenar con datos de prueba 3
-  const fillWithTestData3 = () => {
-    setFirstName("Fernando")
-    setApellidoPaterno("May")
-    setApellidoMaterno("Bustos")
-    setEmail("fernando.personalizado@outlook.com") // Otro email diferente
-    setRoomNumber("456")
-    setEmailError("")
-    setRoomError("")
-  }
-
   useEffect(() => {
     setCurrentStep(3)
   }, [setCurrentStep])
@@ -302,31 +269,6 @@ export default function InformacionPage({ onNext, onBack }: InformacionPageProps
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-white">Datos Personales</h2>
-          </div>
-
-          {/* Botones de prueba */}
-          <div className="text-center mb-8">
-            <div className="flex flex-wrap justify-center gap-4">
-              <button
-                onClick={fillWithTestData}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg"
-              >
-                🧪 Email Nuevo
-              </button>
-              <button
-                onClick={fillWithTestData2}
-                className="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg"
-              >
-                🧪 Email Original
-              </button>
-              <button
-                onClick={fillWithTestData3}
-                className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg"
-              >
-                🧪 Email Personalizado
-              </button>
-            </div>
-            <p className="text-slate-400 text-sm mt-2">Prueba diferentes emails - todos funcionan con los mismos datos de huésped</p>
           </div>
 
           {/* Nombre y Apellidos */}
